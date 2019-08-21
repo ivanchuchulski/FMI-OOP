@@ -1,49 +1,36 @@
 #pragma once
 
-
 #ifndef DYNAMICSTACK_H
 #define DYNAMICSTACK_H
 
-
-/*			class DynamicStack definition		*/
-class DynamicStack {
-
-/*private members*/
-private:
-
-	static const int MAX_SIZE = 50;
-	int m_stackTop;
-	int m_Size;
-	int* m_Data;
-
-/*private member functions*/
-private:
-	bool isFull() const;
-	void growStack();
-
-/*public member functions*/
+class DynamicStack 
+{
 public:
-
-	/*ctors and dtor*/
 	DynamicStack();
-	DynamicStack(const DynamicStack& otherDynStack);
+	DynamicStack(const DynamicStack& other);
 	~DynamicStack();
 
-	/*copy assignment operator*/
-	DynamicStack& operator=(const DynamicStack& otherDynStack);
+	DynamicStack& operator=(const DynamicStack& other);
 
-	/*access functions*/
-	bool isEmpty() const;
+	void Clear();
+	bool IsEmpty() const;
+	int PeekTop() const;
 
-	int peekTop() const;
+	int PopOut();
+	void PushIn(int elem);
 
-	/*pop and push functions*/
-	int popOut();
-	void pushIn(int elem);
+private:
+	bool IsFull() const;
+	void GrowStack();
+	void CopyOtherStack(const DynamicStack& other);
 
+private:
+	static const int MAX_SIZE = 50;
 
-
-
+private:
+	int m_stackTop;
+	int m_size;
+	int* m_data;
 };
 
 #endif // !DYNAMICSTACK_H

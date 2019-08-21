@@ -1,205 +1,243 @@
+/*	oop winter 2017-2018
+	homework 1 task 1 : calculator for expressions in reverse polish notation
+	STL classes are prohibited
+*/
+
 #include <iostream>
-#include <string.h>
+#include <cstring>
+
 #include "DynamicStack.h"
 
+#define ERR_EMPTY_INPUT 1;
+#define ERR_INCORRECT_INPUT 2;
+#define ERR_NO_NUMBERS 3;
+#define ERR_NO_OPERATORS 4;
+#define ERR_ZERO_DIVISION 5;
 
-int ascii_To_int(char sym) {
-	if (sym >= '0' && sym <= '9') {
+int AsciiToInt(char sym)
+{
+	if (sym >= '0' && sym <= '9')
 		return (sym - '0');
-	}
+	else
+		return sym;
 }
 
-int strLen(const char* srce) {
-	int counter = 0;
-
-	if (srce == nullptr) {
-		return 0;
-	}
-	while (*srce != '\0') {
-		srce++;
-		counter++;
-	}
-	return counter;
-}
-
-int getArgsNum(char oper) {
-
-	switch (oper) {
-		case '+':
+int GetNeededOperandCount(char oper)
+{
+	switch (oper)
+	{
+		case '+' :
 			return 2;
 		case '-':
 			return 2;
-		case '*':
+
+		case '*' :
 			return 2;
-		case '/':
+
+		case '/' :
 			return 2;
-		case '%':
+
+		case '%' :
 			return 2;
-	default:
-		return 2;
+
+		default:
+			return 2;
 	}
 }
 
-int calculate(char* expr, int len, DynamicStack& numStack) {
+bool IsNumber(char symbol)
+{
+	return symbol >= '0' && symbol <= '9';
+}
 
-	int result = 1;
-	int argsNum = 0;
-	int numsPushed = 0;
+bool IsOperator(char symbol, const char* operators, const int size_operators)
+{
+	for (int i = 0; i < size_operators; i++)
+	{
+		if (symbol == operators[i])
+			return true;
+	}
 
-	int firstOperand = 0;
-	int secondOperand = 0;
+	return false;
+}
 
+bool IsSpace(char symbol)
+{
+	return symbol == ' ';
+}
+
+int CalculateExpression(char* expression, int len, DynamicStack& num_stack) 
+{
 	const char separation = ' ';
-	int moreThanOneDigit = 0;
-	int digitCounter = 0;
 
-	for (int i = 0; i < len; i++) {
+	int result = 0;
+	int operands_in_stack = 0;
 
-		//if the char is operator
-		if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/' || expr[i] == '%') {
-			argsNum = getArgsNum(expr[i]);
+	int first_operand = 0;
+	int second_operand = 0;
 
-			if (argsNum > numsPushed) {
-				//numsPushed is 0,1
-				std::cout << "Error, not enough operands!\n";
-				return 0;
+
+	for (int i = 0; i < len; i++) 
+	{
+		if (IsOperator(expression[i]))
+		{
+			if (GetNeededOperandCount(expression[i]) > operands_in_stack) 
+			{
+				std::cout << "error : wrong operand count, not enough operands\n";
+				return ERR_INCORRECT_INPUT;
 			}
 
+			second_operand = num_stack.PopOut();
+			first_operand = num_stack.PopOut();
+			operands_in_stack -= 2;
 
-			secondOperand = numStack.popOut();
-			firstOperand = numStack.popOut();
-			numsPushed -= 2;
+			switch (expression[i]) 
+			{
+				case '+' :
+					result = first_operand + second_operand;
+					break;
 
-			//evaluate the operator
-			switch (expr[i]) {
-			case '+':
-				result = firstOperand + secondOperand;
-				break;
-			case '-':
-				result = firstOperand - secondOperand;
-				break;
-			case '*':
-				result = firstOperand * secondOperand;
-				break;
-			case '/': {
-				if (secondOperand == 0) {
-					std::cout << "Error, division by zero !\n";
-					return 0;
+				case '-' :
+					result = first_operand - second_operand;
+					break;
+
+				case '*' :
+					result = first_operand * second_operand;
+					break;
+
+				case '/' : 
+				{
+					if (second_operand == 0) 
+					{
+						std::cout << "error : division by zero\n";
+						return ERR_ZERO_DIVISION;
+					}
+
+					result = first_operand / second_operand;
+					break;
 				}
-				else {
-					result = firstOperand / secondOperand;
+
+				case '%' : 
+				{
+					if (second_operand == 0) 
+					{
+						std::cout << "error : modulus division by zero\n";
+						return ERR_ZERO_DIVISION;
+					}
+
+					result = first_operand % second_operand;
 					break;
 				}
 			}
-			case '%': {
-				if (secondOperand == 0) {
-					std::cout << "Error, modulus division by zero!\n";
-					return 0;
-				}
-				else {
-					result = firstOperand % secondOperand;
-					break;
-				}
-			}
-			}
-			//putting back the result in
-			numStack.pushIn(result);
-			numsPushed++;
+
+			num_stack.PushIn(result);
+			operands_in_stack++;
 		}
 
-		//if the first one is a space
-		else if (i == 0 && expr[i] == separation) {
-			for (int k = i + 1; expr[k] != separation; k++, i = k) {
-				moreThanOneDigit = 10 * moreThanOneDigit + ascii_To_int(expr[k]);
+		else if (IsNumber(expression[i])) 
+		{
+			int number = 0;
+
+			for (int k = i; expression[k] != separation; k++, i = k)
+			{
+				number = 10 * number + AsciiToInt(expression[k]);
 			}
-			numStack.pushIn(moreThanOneDigit);
-			numsPushed++;
-			moreThanOneDigit = 0;				//nullifying for next iteration
+
+			num_stack.PushIn(number);
+			operands_in_stack++;
 		}
 
-		//the char is number => we have to put it in the stack
-		else if (expr[i] >= '0' && expr[i] <= '9') {
-			for (int k = i; expr[k] != separation; k++, i = k) {
-				moreThanOneDigit = 10 * moreThanOneDigit + ascii_To_int(expr[k]);
-			}
-			numStack.pushIn(moreThanOneDigit);
-			numsPushed++;
-			moreThanOneDigit = 0;				//nullifying for next iteration
+		// the last case is spaces
+		else
+		{
+			continue;
 		}
+
 	}
 
 	//check if there is more numbers, after the last operator
-	if (numsPushed > 1) {
-		std::cout << "Incorrect expression!\n";
-		return 0;
+	if (operands_in_stack > 1) 
+	{
+		std::cout << "error : not enough operands\n";
+		return ERR_INCORRECT_INPUT;
 	}
 
 	return result;
 }
 
 
-int main() {
+int main()
+{
+	const int LEN_OPERATORS_ARR = 5;
+	const int MAX_EXPRESSION_LEN = 100;
+	const char OPERATORS_ARR[LEN_OPERATORS_ARR + 1] = { '+', '-', '*', '/', '%', '\0' };
+	char expression[MAX_EXPRESSION_LEN + 1];
+	DynamicStack calculatorStack = DynamicStack();
 
-	const char OPERATORS_ARR[6] = { '+', '-', '*', '/', '%', '\0' };
-	char userInput[101];	
-	DynamicStack numberStack = DynamicStack();
+	std::memset(expression, '\0', 101);		//nullify the array
 
-	/*some sample inputs*/
+	// user input
+	std::cout << "Enter an expression in RPN:\ncalculator works only with whole numbers\n!Surround two or more digit numbers with spaces\n";
+	std::cin.getline(expression, 101);
+
+	int expression_len = std::strlen(expression);
+	bool empty_input = false;
+	bool has_operators = false;
+	bool has_numbers = false;
+	bool has_wrong_char = false;
+
+	// error checking
+	// RPN expressions don't need braces, they consist only of numbers and arithmetic operators and in our case spaces
+	if (expression_len == 0)
+	{
+		std::cout << "error : wrong input, empty string\n";
+		return ERR_INCORRECT_INPUT;
+	}
+
+	for (int i = 0; i < expression_len; i++)
+	{
+		if (IsOperator(expression[i]))
+			has_operators = true;
+
+		else if (IsNumber(expression[i]))
+			has_numbers = true;
+
+		else if (IsSpace(expression[i]))
+			continue;
+
+		else
+		{
+			has_wrong_char = true;
+			break;
+		}
+	}
+
+	if (has_wrong_char)
+	{
+		std::cout << "error : wrong input, expression should only contain digits, arithmetic operators and spaces";
+		return ERR_INCORRECT_INPUT;
+	}
+
+	else if (!has_numbers) 
+	{
+		std::cout << "error : wrong input, no numbers in the expression\n";
+		return ERR_NO_NUMBERS;
+	}
+
+	else if (!has_operators) 
+	{
+		std::cout << "error : wrong input, no operators in the expression\n";
+		return ERR_NO_OPERATORS;
+	}
+
+	int result = CalculateExpression(expression, expression_len, calculatorStack);
+
+	std::cout << "Result = " << result << '\n';
+
+	// some sample inputs
 	//char sampleInput0[] = { " 5 1 2 + 4 * + 3 -" };
 	//char sampleInput1[] = { "3 10 + 6 *" };
 	//char sampleInput2[] = { " 10 3 + 6 *" };
 
-
-	memset(userInput, '\0', 101);		//nullify the array
-
-	/*	get userInput	*/
-	std::cout << "Enter an expression in RPN:\n!Surround two or more digit numbers with spaces please!\n";
-	std::cin.getline(userInput, 101);
-
-	int exprLen = strLen(userInput);
-	bool emptyInput = false;
-	bool hasOperators = false;
-	bool hasNumbers = false;
-
-	/*	input handling	*/
-	if (exprLen == 0) {
-		emptyInput = true;
-	}
-	else {
-		for (int j = 0; j < exprLen; ++j) {
-			//check for numbers
-			if (userInput[j] >= '0' && userInput[j] <= '9') {
-				hasNumbers = true;
-			}
-			//check for operators
-			else if (userInput[j] == OPERATORS_ARR[0]	||		//checking for +
-					 userInput[j] == OPERATORS_ARR[1]	||		//checking for -
-					 userInput[j] == OPERATORS_ARR[2]	||		//checking for *
-					 userInput[j] == OPERATORS_ARR[3]	||		//checking for /
-					 userInput[j] == OPERATORS_ARR[4])			//checking for %
-			{
-				hasOperators = true;
-			}
-		}
-	}
-
-	if (emptyInput == true) {
-		std::cout << "Wrong input, empty string!\n";
-		return 0;
-	}
-	if (hasNumbers == false) {
-		std::cout << "Wrong input, no numbers!\n";
-		return 0;
-	}
-	else if (hasOperators == false) {
-		std::cout << "Wrong input, no operators!\n";
-		return 0;
-	}
-
-	int result  = calculate(userInput, exprLen, numberStack);
-	std::cout << "Result = " << result << '\n';
-
-	/*ending to keep window open*/
-//	std::cin.get();
 	return 0;
 }
