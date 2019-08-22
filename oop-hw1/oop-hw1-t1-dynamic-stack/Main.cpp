@@ -1,4 +1,4 @@
-/*	oop winter 2017-2018
+/*	oop summer 2017-2018
 	homework 1 task 1 : calculator for expressions in reverse polish notation
 	STL classes are prohibited
 */
