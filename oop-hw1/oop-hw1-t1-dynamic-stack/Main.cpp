@@ -14,12 +14,15 @@
 #define ERR_NO_OPERATORS 4;
 #define ERR_ZERO_DIVISION 5;
 
-int AsciiToInt(char sym)
+const int LEN_OPERATORS_ARR = 5;
+const char OPERATORS_ARR[LEN_OPERATORS_ARR + 1] = { '+', '-', '*', '/', '%', '\0' };
+
+int AsciiToInt(char symbol)
 {
-	if (sym >= '0' && sym <= '9')
-		return (sym - '0');
+	if (symbol >= '0' && symbol <= '9')
+		return (symbol - '0');
 	else
-		return sym;
+		return symbol;
 }
 
 int GetNeededOperandCount(char oper)
@@ -27,16 +30,9 @@ int GetNeededOperandCount(char oper)
 	switch (oper)
 	{
 		case '+' :
-			return 2;
-		case '-':
-			return 2;
-
+		case '-' :
 		case '*' :
-			return 2;
-
 		case '/' :
-			return 2;
-
 		case '%' :
 			return 2;
 
@@ -50,9 +46,9 @@ bool IsNumber(char symbol)
 	return symbol >= '0' && symbol <= '9';
 }
 
-bool IsOperator(char symbol, const char* operators, const int size_operators)
+bool IsOperator(char symbol, const char* operators, const int len_operators)
 {
-	for (int i = 0; i < size_operators; i++)
+	for (int i = 0; i < len_operators; i++)
 	{
 		if (symbol == operators[i])
 			return true;
@@ -66,7 +62,7 @@ bool IsSpace(char symbol)
 	return symbol == ' ';
 }
 
-int CalculateExpression(char* expression, int len, DynamicStack& num_stack) 
+int CalculateExpression(char* expression, int len_expression, DynamicStack& num_stack) 
 {
 	const char separation = ' ';
 
@@ -77,9 +73,9 @@ int CalculateExpression(char* expression, int len, DynamicStack& num_stack)
 	int second_operand = 0;
 
 
-	for (int i = 0; i < len; i++) 
+	for (int i = 0; i < len_expression; i++) 
 	{
-		if (IsOperator(expression[i]))
+		if (IsOperator(expression[i], OPERATORS_ARR, LEN_OPERATORS_ARR))
 		{
 			if (GetNeededOperandCount(expression[i]) > operands_in_stack) 
 			{
@@ -152,7 +148,6 @@ int CalculateExpression(char* expression, int len, DynamicStack& num_stack)
 		{
 			continue;
 		}
-
 	}
 
 	//check if there is more numbers, after the last operator
@@ -165,19 +160,19 @@ int CalculateExpression(char* expression, int len, DynamicStack& num_stack)
 	return result;
 }
 
-
 int main()
 {
-	const int LEN_OPERATORS_ARR = 5;
+
 	const int MAX_EXPRESSION_LEN = 100;
-	const char OPERATORS_ARR[LEN_OPERATORS_ARR + 1] = { '+', '-', '*', '/', '%', '\0' };
 	char expression[MAX_EXPRESSION_LEN + 1];
-	DynamicStack calculatorStack = DynamicStack();
+	DynamicStack calculator_stack = DynamicStack();
 
 	std::memset(expression, '\0', 101);		//nullify the array
 
 	// user input
-	std::cout << "Enter an expression in RPN:\ncalculator works only with whole numbers\n!Surround two or more digit numbers with spaces\n";
+	std::cout << "\nCalculator works only with whole numbers\n\
+Surround two or more digit numbers with spaces\n\
+Enter an expression in RPN:";
 	std::cin.getline(expression, 101);
 
 	int expression_len = std::strlen(expression);
@@ -196,7 +191,7 @@ int main()
 
 	for (int i = 0; i < expression_len; i++)
 	{
-		if (IsOperator(expression[i]))
+		if (IsOperator(expression[i], OPERATORS_ARR, LEN_OPERATORS_ARR))
 			has_operators = true;
 
 		else if (IsNumber(expression[i]))
@@ -230,14 +225,14 @@ int main()
 		return ERR_NO_OPERATORS;
 	}
 
-	int result = CalculateExpression(expression, expression_len, calculatorStack);
+	int result = CalculateExpression(expression, expression_len, calculator_stack);
 
 	std::cout << "Result = " << result << '\n';
 
 	// some sample inputs
-	//char sampleInput0[] = { " 5 1 2 + 4 * + 3 -" };
-	//char sampleInput1[] = { "3 10 + 6 *" };
-	//char sampleInput2[] = { " 10 3 + 6 *" };
+	//char sampleInput0[] = { " 5 1 2 + 4 * + 3 -" };			// 5 + (1 + 2) * 3) - 3 = 17
+	//char sampleInput1[] = { "3 10 + 6 *" };					// (3 + 10) * 6 = 78
+	//char sampleInput2[] = { "75 3 / 5 5 * / 10 +" };			// 75 / 3 / (5 * 5) + 10 = 11
 
 	return 0;
 }

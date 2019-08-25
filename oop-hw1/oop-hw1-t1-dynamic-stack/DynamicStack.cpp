@@ -5,7 +5,7 @@
 
 DynamicStack::DynamicStack()
 	:	m_stackTop(-1),
-		m_size(MAX_SIZE)
+		m_size(MAX_SIZE),
 		m_data(nullptr)
 {
 	m_data = new int[m_size];
