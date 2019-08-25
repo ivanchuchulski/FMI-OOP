@@ -1,14 +1,12 @@
 #pragma once
 
-
 #ifndef HISTORY_ENTRY_H
 #define HISTORY_ENTRY_H
 
 #include <iostream>
 
-
 /*enum to represent months of the year*/
-enum Month
+enum class Month
 {
 	Unknown = 0,
 	January = 1,	 February = 2,		March = 3,
@@ -17,37 +15,28 @@ enum Month
 	October = 10,	 November = 11,		December = 12
 };
 
-/*		HistoryEntry structure definition	*/
-struct HistoryEntry {
-
+struct HistoryEntry 
+{
 public:
-	Month m_Date;
-	char* m_Url;
-
-protected:
-	char* SetCString(const char* source = nullptr);
-
-public:
-	/*constructors and destructor*/
 	HistoryEntry();
-	HistoryEntry(Month date, char* url );
-	HistoryEntry(const HistoryEntry& otherHisEntry);
+	HistoryEntry(const HistoryEntry& other);
+	HistoryEntry(int date, char* url);
 	~HistoryEntry();
 
-	/*copy assignment operator*/
-	HistoryEntry& operator=(const HistoryEntry& otherHisEntry);
+	HistoryEntry& operator=(const HistoryEntry& other);
 
-	friend std::ostream& operator<<(std::ostream& outStream, const HistoryEntry& hisEntry);
-	friend std::istream& operator>>(std::istream& inStream, HistoryEntry& history);
+	void SetUrl(const char* url);
+	void SetDate(int date);
 
-	/*setters*/
-	void setUrl(char* url);
-	void setDate(Month date);
+	const char* GetUrl() const;
+	Month GetDate() const;
 
-	/*getters*/
-	const char* getUrl() const;
-	Month getDate() const;
+	friend std::ostream& operator<<(std::ostream& outStream, const HistoryEntry& historyEntry);
+	friend std::istream& operator>>(std::istream& inStream, HistoryEntry& historyEntry);
 
+public:
+	Month m_date;
+	char* m_url;
 };
 
 #endif // !HISTORY_ENTRY_H

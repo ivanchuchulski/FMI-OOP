@@ -3,54 +3,46 @@
 #ifndef BROWSER_HISTORY_H
 #define BROWSER_HISTORY_H
 
-//#include <iostream>
 #include "HistoryEntry.h"
 
-
-/*		BrowsenHistory class definition 	*/
-class BrowserHistory {
-
-private:
-	int m_MaxSize;
-	int m_EntriesCount;
-	HistoryEntry* m_HistoryArr;
-	int m_MonthsCounter[13];		//each index in the array represents a month, the same way the enum Month does
-
-private:
-	void nullOutMonths();
-
-private:
-	/*these two are my first ideas, they work a bit diffetrent, but really inefficiently, so they should not be used*/
-	BrowserHistory Concat_V1(const BrowserHistory& firstBrowser, const BrowserHistory& secondBrowser);
-	BrowserHistory Concat_V2(const BrowserHistory& firstBrowser, const BrowserHistory& secondBrowser);
-
-	/*private constructor, used is the concatenation method*/
-	BrowserHistory(int max_size, int first_entries, int entries_count, HistoryEntry* first_historyArr, HistoryEntry* second_historyArr, int* months_counter);
-
+// basicly the class implements a stack, LIFO principle, with fixed max size
+class BrowserHistory
+{
 public:
-	/*constructors and destructor*/
 	BrowserHistory();
-	BrowserHistory(int N);
 	BrowserHistory(const BrowserHistory& otherBrowserHistory);
+	BrowserHistory(int browserMemory);
 	~BrowserHistory();
 
-	/*copy assignment operator*/
 	BrowserHistory& operator=(const BrowserHistory& otherBrowserHistory);
 
-	/*input methods*/
-	void AddEntry(const HistoryEntry& HistEntry);
-	void InputEntry();
-	
-	/*print methods*/
+	void Clear();
+	bool Empty() const;
+
+	bool AddEntry(const HistoryEntry& histEntry);
+	bool InputEntry();
+
+	bool RemoveLatestEntry();
+
 	void PrintAll() const;
 	void PrintByMonth(int Month) const;
 	void MostActiveMonth() const;
 
-	/*removing method*/
-	void RemoveLatestEntry();
-
-	/*concatenating mehtod*/
 	BrowserHistory Concatenate(const BrowserHistory& otherBrowser);
+
+private:
+	void NullifyMonthsArray();
+	bool Full() const;
+	int CurrentSize() const;
+
+private:
+	int m_maxCapacity;
+	int m_arrTop;
+	HistoryEntry* m_historyArr;
+	int m_monthsFrequency[13];		//each index in the array represents a month, the same way the enum Month does
+
+private:
+	const int M_DEFAULT_MAX_CAPACITY = 5;
 };
 
 #endif // !BROWSER_HISTORY_H

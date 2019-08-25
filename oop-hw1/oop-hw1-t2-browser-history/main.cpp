@@ -1,13 +1,19 @@
+/*	oop summer 2017-2018
+	homework 1 task 2 : browser history with fixed size
+	STL classes are prohibited
+*/
+
 #include <iostream>
+
 #include "BrowserHistory.h"
 
 
 int main() {
 
-	HistoryEntry entry1 = HistoryEntry(January, "www.example.com");
-	HistoryEntry entry2 = HistoryEntry(January, "www.hello.com");
-	HistoryEntry entry3 = HistoryEntry( February, "www.fmi.bg");
-	HistoryEntry entry4 = HistoryEntry(Unknown, nullptr);
+	HistoryEntry entry1 = HistoryEntry(static_cast<int>(Month::January), "www.first.com");
+	HistoryEntry entry2 = HistoryEntry(static_cast<int>(Month::January), "www.second.com");
+	HistoryEntry entry3 = HistoryEntry(static_cast<int>(Month::February), "www.third.bg");
+	HistoryEntry entry4 = HistoryEntry(static_cast<int>(Month::Unknown), nullptr);
 
 	{
 		BrowserHistory history0 = BrowserHistory(5);
@@ -44,14 +50,15 @@ int main() {
 
 	(*history4) = history2.Concatenate(*history3);
 
+	std::cout << '\n';
 	history3->PrintAll();
-	history4->PrintAll();
 
+	std::cout << '\n';
+	history4->PrintAll();
 
 	/*free memory*/
 	delete history4;
 	delete history3;
 
-	std::cin.get();
 	return 0;
 }
