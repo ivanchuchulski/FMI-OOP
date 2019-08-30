@@ -5,60 +5,78 @@
 
 #include <iostream>
 
-/*		class Mouse definition
-->the class defines a computer mouse characteristics*/
-class Mouse {
-
-/*private member data*/
-private:
-	bool m_IsWireless;		
-	bool m_IsBacklit;
-	int m_ButtonsNum;
-	int m_Count;			//how many mice we have of the particular specification
-	char* m_Brand;
-	char* m_Model;
-	float m_Price;
-	char m_SKU[21];			//Stock Keeping Unit, unique ID, max 20 characters + '\0'
-
-/*helper functions*/
-protected:
-	char* SetCString(const char* source = nullptr);
-
-/*public methods*/
+// the class defines a computer mouse characteristics
+class ComputerMouse 
+{
 public:
-	/*constructors and destructor*/
-	Mouse();
-	Mouse(bool wireless, bool backlit, int buttonsNum, int count, char* sku, char* brand, char* model, float price);
-	Mouse(const Mouse& otherMouse);
-	~Mouse();
+	ComputerMouse();
+	ComputerMouse(bool wireless, bool backlit, int buttonsNum, int unitsInStock, const char* brand, const char* model, const char* sku, float price);
+	ComputerMouse(const ComputerMouse& otherMouse);
+	~ComputerMouse();
 
 	/*copy assignment operator*/
-	Mouse& operator=(const Mouse& otherMouse);
-	
-	/*friend functions for console output and input*/
-	friend std::ostream& operator<<(std::ostream& outStream, const Mouse& someMouse);
-	friend std::istream& operator>>(std::istream& inStream, Mouse& someMouse);
+	ComputerMouse& operator=(const ComputerMouse& otherMouse);
 
-	/*setters*/
-	void setButtonsNum(const int buttonsNum);
-	void setCount(const int count);
-	void setSKU(const char* SKU);
-	void setBrand(const char* brand);
-	void setModel(const char* model);
-	void setPrice(const float price);
+	void SetWireless(const bool wireless);
+	void SetBacklit(const bool backlit);
+	void SetNumberOfButtons(const int buttonsNum);
+	void ChangeUnitsInStock(const int count);
+	void SetBrand(const char* brand);
+	void SetModel(const char* model);
+	void SetPrice(const float price);
+	void SetSKU(const char* SKU);
 
-	/*getters*/
-	int getCount() const;
-	const char* getSKU() const;
-	const char* getBrand() const;
-	const char* getModel() const;
-	const float getPrice() const;
+	bool GetWireless() const;
+	bool GetBacklit() const;
+	int GetNumberOfButtons() const;
+	int GetUnitsInStockCount() const;
+	const char* GetBrand() const;
+	const char* GetModel() const;
+	const float GetPrice() const;
+	const char* GetSKU() const;
+
+	static const int GetSKULen();
 
 	/*method to change an exsiting unit*/
 	void ModifyMouse();
 
-};
+	/*friend functions for console output and input*/
+	friend std::ostream& operator<<(std::ostream& outStream, const ComputerMouse& mouse);
+	friend std::istream& operator>>(std::istream& inStream, ComputerMouse& mouse);
 
+private:
+	void Clear();
+	void CopyFromOther(const ComputerMouse& other);
+	void NullifySKU();
+
+private:
+	bool m_wireless;
+	bool m_backlit;
+
+	int m_numberOfButtons;
+	int m_unitsInStock;
+
+	char* m_brand;
+	char* m_model;
+
+	float m_price;
+
+	static const int M_LEN_SKU = 10;
+	char m_SKU[M_LEN_SKU + 1];			//Stock Keeping Unit, unique ID, max 10 characters + '\0'
+
+private:
+	const bool M_WIRELESS_DEFAULT = 0;
+	const bool M_BACKLIT_DEFAULT = 0;
+
+	const int M_NUMBER_OF_BUTTONS_DEFAULT = 3;
+	const int M_UNITS_IN_STOCK_DEFAULT = 0;
+
+	const char* M_BRAND_DEFAULT = "no_brand";
+	const char* M_MODEL_DEFAULT = "no_model";
+
+	const float M_PRICE_DEFAULT = 0.0f;
+	const char* M_SKU_DEFUALT = "abcdefghij";
+};
 
 #endif //  the clause is for !MOUSE_CLASS
 

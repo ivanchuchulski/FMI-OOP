@@ -1,384 +1,331 @@
-#include <iostream>
-#include <string.h>
 #include "Mouse.h"
 
+#include <cstring>
 
-/*		class Mouse methods definition		*/
-#pragma region
 
-char * Mouse::SetCString(const char* source) {
-
-	char* bufferPtr = nullptr;
-
-	if (source != nullptr) {
-		int Len = strlen(source);
-		bufferPtr = new char[Len + 1];
-		memcpy_s(bufferPtr, Len + 1, source, Len + 1);
-		return bufferPtr;
-	}
-	else {
-		bufferPtr = new char[8];
-		memcpy_s(bufferPtr, 8, "Unkwown", 8);
-		return bufferPtr;
-	}
-
-}
-
-/*default ctor*/
-Mouse::Mouse()
-	:	m_IsWireless(false),
-		m_IsBacklit(false),
-		m_ButtonsNum(3),
-		m_Count(10),
-		m_Brand(SetCString()),
-		m_Model(SetCString()),
-		m_Price(5),
+ComputerMouse::ComputerMouse()
+	:	m_wireless(M_WIRELESS_DEFAULT),
+		m_backlit(M_BACKLIT_DEFAULT),
+		m_numberOfButtons(M_NUMBER_OF_BUTTONS_DEFAULT),
+		m_unitsInStock(M_UNITS_IN_STOCK_DEFAULT),
+		m_brand(nullptr),
+		m_model(nullptr),
+		m_price(M_PRICE_DEFAULT),
 		m_SKU()
 {
-	memset(m_SKU, '\0', 21);
+	NullifySKU();
 }
 
-/*ctor with parameters*/
-Mouse::Mouse(bool wireless, bool backlit, int buttonsNum, int count, char* sku, char* brand, char* model, float price)
-	:	m_IsWireless(wireless),
-		m_IsBacklit(backlit),
-		m_ButtonsNum(0),
-		m_Count(0),
-		m_Brand(SetCString(brand)),
-		m_Model(SetCString(model)),
-		m_Price(0.0f),
+ComputerMouse::ComputerMouse(bool wireless, bool backlit, int buttonsNum, int unitsInStock, const char* brand, const char* model, const char* sku, float price)
+	:	m_wireless(wireless),
+		m_backlit(backlit),
+		m_numberOfButtons(),
+		m_unitsInStock(),
+		m_brand(nullptr),
+		m_model(nullptr),
+		m_price(),
 		m_SKU()
 {	
-	memset(m_SKU, '\0', 21);
+	NullifySKU();
 
-	if (buttonsNum > 0) {	m_ButtonsNum = buttonsNum;	}
-	if (count > 0) { m_Count = count; }
-	if (price > 0) { m_Price = price; }
+	SetNumberOfButtons(buttonsNum);
+	ChangeUnitsInStock(unitsInStock);
 
-
-	//setting m_SKU
-	if (sku != nullptr) {
-		int skuLen = strlen(sku);
-
-		if (skuLen <= 20) {
-			//if the len is exacly or less than 20, then copy the whole thing
-			for (int i = 0; i < skuLen; i++) {
-				m_SKU[i] = sku[i];
-			}
-			//m_SKU[skuLen] = '\0';
-		}
-		else {
-			//otherwise copy only to the max size of the SKU array
-			for (int i = 0; i < 20; i++) {
-				m_SKU[i] = sku[i];
-			}
-			//m_SKU[20] = '\0';
-		}
-	}
+	SetBrand(brand);
+	SetModel(model);
+	
+	SetPrice(price);
+	SetSKU(sku);
 }
 
-/*copy ctor*/
-Mouse::Mouse(const Mouse& otherMouse)
-	:	m_IsWireless(otherMouse.m_IsWireless),
-		m_IsBacklit(otherMouse.m_IsBacklit),
-		m_ButtonsNum(otherMouse.m_ButtonsNum),
-		m_Count(otherMouse.m_Count),
-		m_Brand(SetCString(otherMouse.m_Brand)),
-		m_Model(SetCString(otherMouse.m_Model)),
-		m_Price(otherMouse.m_Price),
+ComputerMouse::ComputerMouse(const ComputerMouse& otherMouse)
+	:	m_wireless(otherMouse.GetWireless()),
+		m_backlit(otherMouse.GetBacklit()),
+		m_numberOfButtons(otherMouse.GetNumberOfButtons()),
+		m_unitsInStock(otherMouse.GetUnitsInStockCount()),
+		m_brand(nullptr),
+		m_model(nullptr),
+		m_price(otherMouse.GetPrice()),
 		m_SKU()
 {
-	memset(m_SKU, '\0', 21);
+	NullifySKU();
+	SetBrand(otherMouse.GetBrand());
+	SetModel(otherMouse.GetModel());
 
-	//setting m_SKU
-	int skuLen = strlen(otherMouse.m_SKU);
+	// CopyFromOther(otherMouse);
+}
 
-	if (skuLen <= 20) {
-		//if the len is exacly or less than 20, then copy the whole thing
-		for (int i = 0; i < skuLen; i++) {
-			m_SKU[i] = otherMouse.m_SKU[i];
-		}
-		//m_SKU[skuLen] = '\0';
+ComputerMouse::~ComputerMouse() 
+{
+	if (m_brand != nullptr) 
+	{
+		delete[] m_brand;
 	}
-	else {
-		//otherwise copy only to the max size of the SKU array
-		for (int i = 0; i < 20; i++) {
-			m_SKU[i] = otherMouse.m_SKU[i];
-		}
-		//m_SKU[20] = '\0';
+	if (m_model != nullptr) {
+		delete[] m_model;
 	}
 }
 
-/*destructor*/
-Mouse::~Mouse() {
-	//free memory if needed
-	if (m_Brand != nullptr) {
-		delete[] m_Brand;
-	}
-	if (m_Model != nullptr) {
-		delete[] m_Model;
-	}
-}
-
-/*copy assignment operator*/
-Mouse& Mouse::operator=(const Mouse& otherMouse) {
-
-	if (this != &otherMouse) {
-		//free current memory if needed
-		if (m_Brand != nullptr) {
-			delete[] m_Brand;
-			m_Brand = nullptr;
-		}
-		if (m_Model != nullptr) {
-			delete[] m_Model;
-			m_Model = nullptr;
-		}
-
-		//setting non-dynamic memory data
-		m_IsWireless = otherMouse.m_IsWireless;
-		m_IsBacklit = otherMouse.m_IsBacklit;
-		m_ButtonsNum = otherMouse.m_ButtonsNum;
-		m_Count = otherMouse.m_Count;
-		m_Price = otherMouse.m_Price;
-
-		m_Brand = SetCString(otherMouse.m_Brand);
-		m_Model = SetCString(otherMouse.m_Model);
-
-		//setting m_SKU
-		int skuLen = strlen(otherMouse.m_SKU);
-
-		if (skuLen <= 20) {
-			//if the len is exacly or less than 20, then copy the whole thing
-			for (int i = 0; i < skuLen; i++) {
-				m_SKU[i] = otherMouse.m_SKU[i];
-			}
-			m_SKU[skuLen] = '\0';
-		}
-		else {
-			//otherwise copy only to the max size of the SKU array
-			for (int i = 0; i < 20; i++) {
-				m_SKU[i] = otherMouse.m_SKU[i];
-			}
-			m_SKU[20] = '\0';
-		}
+ComputerMouse& ComputerMouse::operator=(const ComputerMouse& otherMouse) 
+{
+	if (this != &otherMouse) 
+	{
+		Clear();
+		CopyFromOther(otherMouse);
 	}
 	return *this;			// TODO: insert return statement here
 }
 
-/*friend functions for console output and input*/
-std::ostream& operator<<(std::ostream& outStream, const Mouse& someMouse) {
+void ComputerMouse::Clear()
+{
+	SetWireless(M_WIRELESS_DEFAULT);
+	SetBacklit(M_BACKLIT_DEFAULT);
 
-	//outStream << "\nPrinting a mouse : \n";
+	SetNumberOfButtons(M_NUMBER_OF_BUTTONS_DEFAULT);
+	ChangeUnitsInStock(M_UNITS_IN_STOCK_DEFAULT);
 
+	delete[] m_brand;
+	m_brand = nullptr;
 
-	if (someMouse.m_Brand == nullptr || someMouse.m_Model == nullptr) {
-		outStream << '\t' << "It is unknown\n";
-	}
-	else {
-		outStream << '\t' << "It is called : " << someMouse.m_Brand << ' ' << someMouse.m_Model << '\n';
+	delete[] m_model;
+	m_model = nullptr;
 
-		if (someMouse.m_SKU[0] == '\0') {
-			outStream << '\t' << "It does not have unique ID \n";
-		}
-		else {
-			outStream << '\t' << "Its unique ID is : " << someMouse.m_SKU << '\n';
-		}
+	SetPrice(M_PRICE_DEFAULT);
 
-
-
-		if (someMouse.m_IsWireless == true)
-		{
-			outStream << '\t' << "It is wireless\n";
-		}
-		else
-		{
-			outStream << '\t' << "It is not wireless\n";
-		}
-
-
-		if (someMouse.m_IsBacklit == true)
-		{
-			outStream << '\t' << "It has backlighting\n";
-		}
-		else
-		{
-			outStream << '\t' << "It has not backlighting\n";
-		}
-
-		outStream << '\t' << "Number of buttons : " << someMouse.m_ButtonsNum << '\n';
-
-		outStream << '\t' << "There are " << someMouse.m_Count << " units of it\n";
-		outStream << '\t' << "Each one costs " << someMouse.m_Price << " euro\n";
-	}
-	outStream << '\n';
-
-	return outStream;			// TODO: insert return statement here
+	NullifySKU();
 }
 
-std::istream& operator>>(std::istream& inStream, Mouse& someMouse) {
-	int bufferWireless = 0;
-	int bufferBacklight = 0;
-	int buffferButtons = 0;
-	int bufferCount = 0;
-	char* bufferSKU = new char[50];
-	char* bufferBrand = new char[50];
-	char* bufferModel = new char[50];
-	float bufferPrice = 0;
+void ComputerMouse::CopyFromOther(const ComputerMouse& other)
+{
+	SetWireless(other.GetWireless());
+	SetBacklit(other.GetBacklit());
 
-	std::cout << "Please input the mouse parameters :\n";
+	SetNumberOfButtons(other.GetNumberOfButtons());
+	ChangeUnitsInStock(other.GetUnitsInStockCount());
 
-	std::cout << '\t' << "Wireless : ";
-	inStream >> bufferWireless;
+	SetBrand(other.GetBrand());
+	SetModel(other.GetModel());
 
-	std::cout << '\t' << "Backlit : ";
-	inStream >> bufferBacklight;
+	SetPrice(other.GetPrice());
 
-	std::cout << '\t' << "Number of buttons : ";
-	inStream >> buffferButtons;
-
-	std::cout << '\t' << "Count : ";
-	inStream >> bufferCount;
-
-	std::cout << '\t' << "Price : ";
-	inStream >> bufferPrice;
-
-	inStream.ignore();
-
-	std::cout << '\t' << "SKU (max 20 chars) : ";
-	inStream.getline(bufferSKU, 50);
-	std::cout << '\t' << "Brand : ";
-	inStream.getline(bufferBrand, 50);
-	std::cout << '\t' << "Model :";
-	inStream.getline(bufferModel, 50);
-
-	std::cout << std::endl;
-
-	if (bufferWireless == 0) {
-		someMouse.m_IsWireless = false;
-	}
-	else {
-		someMouse.m_IsWireless = true;
-	}
-
-	if (bufferBacklight == 0) {
-		someMouse.m_IsBacklit = false;
-	}
-	else {
-		someMouse.m_IsBacklit = true;
-	}
-
-	//calling the setter methods
-	someMouse.setButtonsNum(buffferButtons);
-	someMouse.setCount(bufferCount);
-	someMouse.setPrice(bufferPrice);
-	someMouse.setSKU(bufferSKU);
-	someMouse.setBrand(bufferBrand);
-	someMouse.setModel(bufferModel);
-
-	//free memory
-	delete[] bufferSKU;
-	delete[] bufferBrand;
-	delete[] bufferModel;
-
-	return inStream;			// TODO: insert return statement here
+	SetSKU(other.GetSKU());
 }
 
-/*setters*/
-void Mouse::setButtonsNum(const int buttonsNum) {
-	if (buttonsNum > 0) {
-		m_ButtonsNum = buttonsNum;
-	}
-	else {
-		m_ButtonsNum = 0;
-	}
+void ComputerMouse::NullifySKU()
+{
+	std::memset(m_SKU, '\0', M_LEN_SKU);
 }
 
-void Mouse::setCount(const int count) {
-	if (count > 0) {
-		m_Count = count;
-	}
-	else {
-		m_Count = 0;
-	}
+
+void ComputerMouse::SetWireless(const bool wireless)
+{
+	m_wireless = wireless;
 }
 
-void Mouse::setSKU(const char* SKU) {
-	memset(m_SKU, '\0', 21);
-
-	if (SKU != nullptr) {
-
-		int skuLen = strlen(SKU);
-		if (skuLen <= 20) {
-			for (int i = 0; i < skuLen; i++) {
-				m_SKU[i] = SKU[i];
-			}
-			m_SKU[skuLen] = '\0';
-		}
-		else {
-			for (int i = 0; i < 20; i++) {
-				m_SKU[i] = SKU[i];
-			}
-			m_SKU[20] = '\0';
-		}
-
-	}
-}
-void Mouse::setBrand(const char* brand) {
-	//free current memory
-	if (m_Brand != nullptr) {
-		delete[] m_Brand;
-		m_Brand = nullptr;
-	}
-
-	m_Brand = SetCString(brand);
-
-}
-void Mouse::setModel(const char* model) {
-	//free current memory
-	if (m_Model != nullptr) {
-		delete[] m_Model;
-		m_Model = nullptr;
-	}
-
-	m_Model = SetCString(model);
-
-}
-void Mouse::setPrice(const float price) {
-	if (price > 0.0f) {
-		m_Price = price;
-	}
-	else {
-		m_Price = 0.0f;
-	}
+void ComputerMouse::SetBacklit(const bool backlit)
+{
+	m_backlit = backlit;
 }
 
-/*getters*/
-int Mouse::getCount() const {
-	return m_Count;
+void ComputerMouse::SetNumberOfButtons(const int buttonsNum) 
+{
+	m_numberOfButtons = (buttonsNum > 0) ? buttonsNum : M_NUMBER_OF_BUTTONS_DEFAULT;
 }
 
-const char* Mouse::getSKU() const {
+void ComputerMouse::ChangeUnitsInStock(const int count) 
+{
+	m_unitsInStock = (count > 0) ? count : M_UNITS_IN_STOCK_DEFAULT;
+}
+
+void ComputerMouse::SetBrand(const char* brand)
+{
+	if (m_brand != nullptr)
+	{
+		delete[] m_brand;
+		m_brand = nullptr;
+	}
+
+	if (brand == nullptr)
+	{
+		brand = M_BRAND_DEFAULT;
+	}
+
+	int brandLen = std::strlen(brand);
+	
+	m_brand = new char[brandLen + 1];
+	std::memcpy(m_brand, brand, brandLen + 1);
+}
+
+void ComputerMouse::SetModel(const char* model) 
+{
+	if (m_model != nullptr)
+	{
+		delete[] m_model;
+		m_model = nullptr;
+	}
+
+	if (model == nullptr)
+	{
+		model = M_MODEL_DEFAULT;
+	}
+
+	int modelLen = std::strlen(model);
+
+	m_model = new char[modelLen + 1];
+	std::memcpy(m_model, model, modelLen + 1);
+}
+
+void ComputerMouse::SetSKU(const char* SKU) 
+{
+	NullifySKU();
+
+    int skuLen = std::strlen(SKU);
+
+	if (SKU == nullptr || skuLen == 0 || skuLen > M_LEN_SKU)
+	{
+		std::memcpy(m_SKU, M_SKU_DEFUALT, M_LEN_SKU);
+		return;
+	}
+
+	std::memcpy(m_SKU, SKU, skuLen);
+}
+
+void ComputerMouse::SetPrice(const float price) 
+{
+	m_price = (price > 0) ? price : M_PRICE_DEFAULT;
+}
+
+// getters
+bool ComputerMouse::GetWireless() const
+{
+	return m_wireless;
+}
+
+bool ComputerMouse::GetBacklit() const
+{
+	return m_backlit;
+}
+
+int ComputerMouse::GetNumberOfButtons() const
+{
+	return m_numberOfButtons;
+}
+
+int ComputerMouse::GetUnitsInStockCount() const 
+{
+	return m_unitsInStock;
+}
+
+const char* ComputerMouse::GetBrand() const 
+{
+	return m_brand;
+}
+
+const char* ComputerMouse::GetModel() const 
+{
+	return m_model;
+}
+
+const float ComputerMouse::GetPrice() const 
+{
+	return m_price;
+}
+
+const char* ComputerMouse::GetSKU() const
+{
 	return m_SKU;
 }
 
-const char* Mouse::getBrand() const {
-	return m_Brand;
+const int ComputerMouse::GetSKULen()
+{
+	return M_LEN_SKU;
 }
 
-const char* Mouse::getModel() const {
-	return m_Model;
-}
-
-const float Mouse::getPrice() const {
-	return m_Price;
-}
-
-/*method to change a mouse*/
-void Mouse::ModifyMouse() {
-	std::cout << "\nModifying...\n";
+void ComputerMouse::ModifyMouse() 
+{
+	std::cout << "Modifying...\n";
 	std::cin >> *this;
 }
 
 
+std::ostream& operator<<(std::ostream& outStream, const ComputerMouse& mouse)
+{
+	outStream << "Mice information : \n";
 
-#pragma endregion
+	outStream << '\t' << "brand name : " << (mouse.GetBrand() != nullptr ? mouse.GetBrand() : "unidentified") << '\n';
+	outStream << '\t' << "model name : " << (mouse.GetModel() != nullptr ? mouse.GetModel() : "unidentified") << '\n';
+
+	outStream << '\t' << (mouse.m_wireless ? "is" : "isn't") << " wireless\n";
+	outStream << '\t' << (mouse.m_backlit ? "is" : "isn't") << " backlit\n";
+
+	outStream << '\t' << "it has " << mouse.GetNumberOfButtons() << " buttons\n";
+	outStream << '\t' << "they are " << mouse.GetUnitsInStockCount() << " units available\n";
+	outStream << '\t' << "each priced at " << mouse.GetPrice() << '\n';
+
+	outStream << '\t' << "product SKU " << mouse.GetSKU() << '\n';
+
+	outStream << std::endl;
+
+	return outStream;			// TODO: insert return statement here
+}
+
+std::istream& operator>>(std::istream& inStream, ComputerMouse& mouse) 
+{
+	int wireless = 0;
+	int backlit = 0;
+	int numOfButtons = 0;
+	int unitsInStock = 0;
+	float price = 0;
+
+	const int MAX_LEN = 50;
+	char* brand = new char[MAX_LEN + 1];
+	char* model = new char[MAX_LEN + 1];
+	char* SKU = new char[MAX_LEN + 1];
+
+
+	std::cout << "Please input the mouse parameters :\n";
+
+	std::cout << '\t' << "Wireless : ";
+	inStream >> wireless;
+
+	std::cout << '\t' << "Backlit : ";
+	inStream >> backlit;
+
+	std::cout << '\t' << "Number of buttons : ";
+	inStream >> numOfButtons;
+
+	std::cout << '\t' << "Units in stock : ";
+	inStream >> unitsInStock;
+
+	std::cout << '\t' << "Price : ";
+	inStream >> price;
+
+	inStream.ignore();
+
+	std::cout << '\t' << "SKU (max " << mouse.GetSKULen() << " chars) : ";
+	inStream.getline(SKU, 50);
+
+	std::cout << '\t' << "Brand : ";
+	inStream.getline(brand, 50);
+
+	std::cout << '\t' << "Model :";
+	inStream.getline(model, 50);
+
+	std::cout << std::endl;
+
+	mouse.SetWireless(wireless);
+	mouse.SetBacklit(backlit);
+	mouse.SetNumberOfButtons(numOfButtons);
+	mouse.ChangeUnitsInStock(unitsInStock);
+	mouse.SetBrand(brand);
+	mouse.SetModel(model);
+	mouse.SetPrice(price);
+	mouse.SetSKU(SKU);
+
+	//free dynamic memory
+	delete[] SKU;
+	delete[] model;
+	delete[] brand;
+
+	return inStream;			// TODO: insert return statement here
+}

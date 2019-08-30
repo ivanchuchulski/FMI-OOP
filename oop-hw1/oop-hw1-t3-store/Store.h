@@ -1,37 +1,28 @@
 #pragma once
 
-
 #ifndef STORE_H
 #define STORE_H
 
 #include "Mouse.h"
 
-/*class Store definition*/
-class Store {
-
-/*private member data*/
-private:
-	int m_MaxSize;
-	int m_MiceCount;
-	Mouse* m_MiceList;
-
-/*private methods*/
-private:
-	void GrowList();
-	int FindBySKU(char* someSKU) const;
-
-/*public methods*/
+// implements a container with LIFO-like principle on insertion and with random place removal
+//		insertion : amortized O(1)
+//		removal : O(N), N - current number of entries in the container
+class Store 
+{
 public:
-	/*constructor and destructor*/
 	Store();
-	Store(int N);
+	Store(int storeCapacity);
 	Store(const Store& otherStore);
 	~Store();
 
-	/*copy asssignment operator*/
 	Store& operator=(const Store& otherStore);
 
-	void InputProduct();
+	bool Empty() const;
+	int CurrentSize() const;
+
+	void InputProductFromUser();
+	void AddProduct(const ComputerMouse& compMouse);
 
 	void DeleteProduct();
 
@@ -39,6 +30,21 @@ public:
 
 	void Print() const;
 
+private:
+	bool Full();
+	void GrowList();
+	void Clear();
+
+	//returns first found index, or -1 on no match 
+	int FindBySKU(const char* sku) const;
+
+private:
+	int m_capacity;
+	int m_top;
+	ComputerMouse* m_mices;
+
+private:
+	const int M_CAPACITY_DEFAULT = 5;
 };
 
 #endif // !STORE_H

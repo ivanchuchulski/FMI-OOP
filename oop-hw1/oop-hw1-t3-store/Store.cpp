@@ -1,195 +1,213 @@
-#include <string.h>
 #include "Store.h"
 
+#include <cstring>
 
 
-/*class Store methods definitions*/
-#pragma region
-
-/*method to find a product, by a given unique ID*/
-int Store::FindBySKU(char* someSKU) const {
-
-	for (int i = 0; i < m_MiceCount; i++) {
-		//searching for a match in the MiceList
-		if (strcmp(m_MiceList[i].getSKU(), someSKU) == 0) {
-			return i;
-		}
-	}
-
-	//if the loop search did not find any matches
-	return -1;
-
-}
-
-/*method to increase the size of the array*/
-void Store::GrowList() {
-	m_MaxSize += 5;		//increase max size
-	Mouse* bufferList = new Mouse[m_MaxSize];
-
-	//copying from current list
-	for (int k = 0; k < m_MiceCount; k++) {
-		bufferList[k] = m_MiceList[k];
-	}
-
-	delete[] m_MiceList;			//free memory
-	m_MiceList = bufferList;		//assign pointer to the newly created block of memory
-}
-
-/*default ctor*/
 Store::Store()
-	:	m_MaxSize(5),
-		m_MiceCount(0),
-		m_MiceList(nullptr)
+	:	m_capacity(M_CAPACITY_DEFAULT),
+		m_top(-1),
+		m_mices(nullptr)
 {
-	m_MiceList = new Mouse[m_MaxSize];
+	m_mices = new ComputerMouse[m_capacity] {};
 }
 
-/*ctor with parameters*/
-Store::Store(int N)
-	:	m_MaxSize(5),
-		m_MiceCount(0),
-		m_MiceList(nullptr)
+Store::Store(int storeCapacity)
+	:	m_capacity((storeCapacity > 0) ? storeCapacity : M_CAPACITY_DEFAULT),
+		m_top(-1),
+		m_mices(nullptr)
 {
-	if (N > 0) {
-		m_MaxSize = N;
-		m_MiceList = new Mouse[m_MaxSize];
-	}
-	else {
-		m_MiceList = new Mouse[m_MaxSize];
-	}
+	m_mices = new ComputerMouse[m_capacity] {};
 }
 
-/*copy ctor*/
 Store::Store(const Store& otherStore)
-	:	m_MaxSize(otherStore.m_MaxSize),
-		m_MiceCount(otherStore.m_MiceCount),
-		m_MiceList(nullptr)
+	:	m_capacity(otherStore.m_capacity),
+		m_top(-1),
+		m_mices(nullptr)
 {
-	m_MiceList = new Mouse[m_MaxSize];
-	//copying from the other store
-	for (int i = 0; i < m_MiceCount; i++) {
-		m_MiceList[i] = otherStore.m_MiceList[i];
+	m_mices = new ComputerMouse[m_capacity] {};
+
+	for (int i = 0; i < otherStore.CurrentSize(); i++)
+		AddProduct(otherStore.m_mices[i]);
+}
+
+Store::~Store() 
+{
+	if (m_mices != nullptr) 
+	{
+		delete[] m_mices;
+		m_mices = nullptr;
 	}
 }
 
-/*destructor*/
-Store::~Store() {
-	//calls the destructor for each Mouse object in the list
-	if (m_MiceList != nullptr) {
-		delete[] m_MiceList;
-		m_MiceList = nullptr;
+Store& Store::operator=(const Store& otherStore) 
+{
+	if (this != &otherStore) 
+	{
+		Clear();
+
+		m_capacity = otherStore.m_capacity;
+		m_mices = new ComputerMouse[m_capacity] {};
+
+		for (int i = 0; i < otherStore.CurrentSize(); i++)
+			AddProduct(otherStore.m_mices[i]);
 	}
-}
 
-/*copy assignment*/
-Store& Store::operator=(const Store& otherStore) {
-
-	if (this != &otherStore) {
-		//free current memory if needed
-		if (m_MiceList != nullptr) {
-			delete[] m_MiceList;
-			m_MiceList = nullptr;
-		}
-
-		m_MaxSize = otherStore.m_MaxSize;
-		m_MiceCount = otherStore.m_MiceCount;
-		m_MiceList = new Mouse[m_MaxSize];
-
-		//copying from the other store
-		for (int i = 0; i < m_MiceCount; i++) {
-			m_MiceList[i] = otherStore.m_MiceList[i];
-		}
-	}
-	// TODO: insert return statement here
 	return *this;
 }
 
 
+bool Store::Empty() const
+{
+	return m_top == -1;
+}
 
-/*method to get user input*/
-void Store::InputProduct() {
-	//check if the list needs to grow
-	if (m_MiceCount == m_MaxSize) {
+bool Store::Full()
+{
+	return m_top == m_capacity - 1;
+}
+
+int Store::CurrentSize() const
+{
+	return m_top + 1;
+}
+
+void Store::GrowList() 
+{
+	m_capacity += 5;
+	ComputerMouse* newMices = new ComputerMouse[m_capacity] {};
+
+	for (int k = 0; k < CurrentSize(); k++)
+		newMices[k] = m_mices[k];
+
+	delete[] m_mices;
+	m_mices = newMices;
+}
+
+void Store::Clear()
+{
+	delete[] m_mices;
+	m_mices = nullptr;
+
+	m_capacity = M_CAPACITY_DEFAULT;
+	m_top = -1;
+}
+
+int Store::FindBySKU(const char* someSKU) const 
+{
+	for (int i = 0; i < CurrentSize(); i++) 
+	{
+		if (strcmp(m_mices[i].GetSKU(), someSKU) == 0) 
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void Store::InputProductFromUser()
+{
+	if (Full())
+	{
 		GrowList();
 	}
 
-	//get input from the console
-	std::cin >> m_MiceList[m_MiceCount];
-	m_MiceCount++;
+	std::cin >> m_mices[++m_top];
 }
 
-void Store::DeleteProduct() {
-	//check
-	if (m_MiceCount == 0) {
-		std::cout << "The store is empty!\n";
+void Store::AddProduct(const ComputerMouse& compMouse)
+{
+	if (Full())
+	{
+		GrowList();
+	}
+
+	m_mices[++m_top] = compMouse;
+}
+
+void Store::DeleteProduct() 
+{
+	if (Empty()) 
+	{
+		std::cout << "nothing to delete, the store is empty\n";
 		return;
 	}
 
-	else {
-		char toFindSKU[20];
+	const int SKU_SIZE = ComputerMouse::GetSKULen();
+	char* skuToFind = new char[SKU_SIZE + 1];
 
-		std::cout << "\nEnter a SKU of a product to delete : ";
-		std::cin.getline(toFindSKU, 20);
+	std::memset(skuToFind, '\0', SKU_SIZE + 1);
 
-		int foundIndex = FindBySKU(toFindSKU);
+	std::cout << "Deleting a product ...\n";
+	std::cout << "Enter a SKU of a product to delete : ";
 
-		if (foundIndex == -1) {
-			std::cout << '\t' << "No such SKU found!\n";
-		}
+	std::cin.getline(skuToFind, SKU_SIZE);
 
-		else {
-			for (int i = foundIndex + 1; i < m_MaxSize; i++) {
-				m_MiceList[i - 1] = m_MiceList[i];
-			}
-			m_MiceCount--;
-			std::cout << "\t Product removed!\n";
-		}
-	}
-}
+	int indexFound = FindBySKU(skuToFind);
 
-/*Modifying method*/
-void Store::ChangeProduct() {
-
-	//check
-	if (m_MiceCount == 0) {
-		std::cout << "The store is empty!\n";
+	if (indexFound == -1) 
+	{
+		std::cout << "No product with such SKU found!\n";
 		return;
 	}
-	else {
-		char toFindSKU[20];
 
-		std::cout << "\nEnter a SKU of a product to change : ";
-		std::cin.getline(toFindSKU, 20);
+	//shifting all the object after the one to delete by one position backward
+	for (int i = indexFound + 1; i < CurrentSize(); i++)
+		m_mices[i - 1] = m_mices[i];
 
-		int foundIndex = FindBySKU(toFindSKU);
 
-		if (foundIndex == -1) {
-			std::cout << '\t' << "No such SKU found!\n";
-		}
+	//setting the object of the top to a default one
+	m_mices[m_top] = ComputerMouse();
+	m_top--;
 
-		else {
-			//calling the modify method
-			m_MiceList[foundIndex].ModifyMouse();
-			std::cout << "\t Product changed!\n";
-		}
-	}
+	std::cout << "Product removal success\n";
+
+	delete[] skuToFind;
 }
 
-void Store::Print() const {
-	//check
-	if (m_MiceCount == 0) {
-		std::cout << "The store is empty!\n";
+void Store::ChangeProduct() 
+{
+	if (Empty()) 
+	{
+		std::cout << "nothing to change, the store is empty\n";
 		return;
 	}
-	else {
-		std::cout << "Printing the products in the store : \n";
 
-		for (int i = 0; i < m_MaxSize; i++) {
-			std::cout << "Product " << i + 1 << " : \n";
-			std::cout << m_MiceList[i] << std::endl;
-		}
+	const int SKU_SIZE = ComputerMouse::GetSKULen();
+	char* skuToFind = new char[SKU_SIZE + 1];
+
+	std::memset(skuToFind, '\0', SKU_SIZE + 1);
+
+	std::cout << "Modifying a product ...\n";
+	std::cout << "enter a SKU of a product to delete : ";
+	std::cin.getline(skuToFind, SKU_SIZE);
+
+	int indexFound = FindBySKU(skuToFind);
+
+	if (indexFound == -1)
+	{
+		std::cout << "No such SKU found!\n";
+		return;
 	}
 
+	m_mices[indexFound].ModifyMouse();
+
+	std::cout << "Product changed successfuly\n";
 }
 
-#pragma endregion
+void Store::Print() const 
+{
+	if (Empty())
+	{
+		std::cout << "noting to print, the store is empty\n";
+		return;
+	}
+
+	std::cout << "Printing the products in the store : \n";
+
+	for (int i = 0; i < CurrentSize(); i++) 
+	{
+		std::cout << "Product " << i << " : \n";
+		std::cout << m_mices[i] << std::endl;
+	}
+}
