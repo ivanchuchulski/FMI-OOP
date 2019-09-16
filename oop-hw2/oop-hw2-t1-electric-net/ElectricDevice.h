@@ -5,50 +5,37 @@
 
 #include <iostream>
 
+#include "String.h"
 
-class ElectricDevice {
-
-/*constants for class ElectricDevice*/
-private:
-	const char NAME_DEFAULT[8] = "Unknown";
-	const int LENGTH_DEFAULT = 7;
-	const int MAX_POWER_DEFAULT = 0;
-
-/*data members*/
-private:
-	int m_Power;		//power in kiloWatts, consumed by the device
-	char* m_Name;
-
-protected:
-	/*helper method do set a c-style null-terminated string*/
-	char* MakeCString(const char* source = nullptr);
-
+class ElectricDevice 
+{
 public:
-	/*constructors*/
 	ElectricDevice();
-	ElectricDevice(int power, const char* name);
+	ElectricDevice(int devicePower, const char* deviceName);
 	ElectricDevice(const ElectricDevice& someDevice);
 
-	/*destructor*/
 	~ElectricDevice();
 
-	/*copy assigment operator*/
 	ElectricDevice& operator=(const ElectricDevice& someDevice);
 
-	/*setters*/
-	void setPower(int power);
-	void setName(const char* name);
+	void SetPower(const int devicePower);
+	void SetName(const String& deviceName);
 
-	/*getters*/
-	int getPower() const;
-	const char* getName() const;
+	int GetPower() const;
+	String GetName() const;
 
 	void PrintDeviceInfo() const;
 
-	friend std::ostream& operator<<(std::ostream& outStream, const ElectricDevice& Device);
+	friend std::ostream& operator<<(std::ostream& outStream, const ElectricDevice& electricDevice);
 
+private:
+	const int M_LENGTH_DEFAULT = 7;
+	const char* NAME_DEFAULT = "Unknown";
+	const int M_DEVICE_POWER_DEFAULT = 0;
+
+private:
+	int m_devicePower;		//power in kiloWatts, consumed by the device
+	String m_deviceName;
 };
-
-
 
 #endif // !ELECTRIC_DEVICE_H

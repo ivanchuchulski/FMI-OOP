@@ -1,98 +1,66 @@
 #include "ElectricDevice.h"
+
 #include <string.h>
 
 
-/*helper method to set a c-style string*/
-char* ElectricDevice::MakeCString(const char* source) {
-
-	char* bufferPtr = nullptr;
-
-	if (source != nullptr) {
-		int len = strlen(source);
-		bufferPtr = new char[len + 1];
-		strcpy_s(bufferPtr, len + 1, source);
-
-		return bufferPtr;
-	}
-	else {
-		bufferPtr = new char[LENGTH_DEFAULT + 1];
-		strcpy_s(bufferPtr, LENGTH_DEFAULT + 1, NAME_DEFAULT);
-		return bufferPtr;
-	}
-
-}
-
-
 ElectricDevice::ElectricDevice()
-	:	m_Power(MAX_POWER_DEFAULT),
-		m_Name(MakeCString())
+	:	m_devicePower(M_DEVICE_POWER_DEFAULT),
+		m_deviceName()
 {}
 
-ElectricDevice::ElectricDevice(int power, const char* name)
-		//using ternary operator to set the power
-	:	 m_Power((power > 0) ? power : MAX_POWER_DEFAULT),
-		m_Name(MakeCString(name))
+ElectricDevice::ElectricDevice(int devicePower, const char* deviceName)
+	:	m_devicePower((devicePower > 0) ? devicePower : M_DEVICE_POWER_DEFAULT),
+		m_deviceName(deviceName)
 {}
 
-ElectricDevice::ElectricDevice(const ElectricDevice & someDevice)
-	:	m_Power(someDevice.m_Power),
-		m_Name(MakeCString(someDevice.m_Name))
+ElectricDevice::ElectricDevice(const ElectricDevice& someDevice)
+	:	m_devicePower(someDevice.m_devicePower),
+		m_deviceName(someDevice.m_deviceName)
 {}
 
-ElectricDevice::~ElectricDevice() {
-	/*free heap memory*/
-	if (m_Name != nullptr) {
-		delete[] m_Name;
-	}
-}
+ElectricDevice::~ElectricDevice() 
+{}
 
-ElectricDevice & ElectricDevice::operator=(const ElectricDevice & someDevice) {
-	if (this != &someDevice) {
-
-		//free current resouce if needed
-		if (m_Name != nullptr) {
-			delete[] m_Name;
-		}
-
-		//copy new data
-		m_Power = someDevice.m_Power;
-		m_Name = MakeCString(someDevice.m_Name);
+ElectricDevice & ElectricDevice::operator=(const ElectricDevice & someDevice) 
+{
+	if (this != &someDevice) 
+	{
+		m_devicePower = someDevice.m_devicePower;
+		m_deviceName = someDevice.m_deviceName;
 	}
 
-	return *this;		// TODO: insert return statement here
+	return *this;
 }
 
-
-void ElectricDevice::setPower(int power) {
-	m_Power = ((power > 0) ? power : MAX_POWER_DEFAULT);
+void ElectricDevice::SetPower(const int devicePower) 
+{
+	m_devicePower = ((devicePower > 0) ? devicePower : M_DEVICE_POWER_DEFAULT);
 }
 
-void ElectricDevice::setName(const char * name) {
-	//free current resouce if needed
-	if (m_Name != nullptr) {
-		delete[] m_Name;
-	}
-	//copy the new one
-	m_Name = MakeCString(name);
+void ElectricDevice::SetName(const String& deviceName) 
+{
+	m_deviceName = deviceName;
 }
 
-int ElectricDevice::getPower() const {
-	return m_Power;
+int ElectricDevice::GetPower() const 
+{
+	return m_devicePower;
 }
 
-const char* ElectricDevice::getName() const {
-	return m_Name;
+String ElectricDevice::GetName() const 
+{
+	return m_deviceName;
 }
 
+std::ostream& operator<<(std::ostream& outStream, const ElectricDevice& electricDevice) 
+{
+	outStream << "\tdevice details : power : " << electricDevice.m_devicePower << "kW, name : " << electricDevice.m_deviceName << '\n';
 
-std::ostream& operator<<(std::ostream & outStream, const ElectricDevice& Device) {
-
-	outStream << "\t Device => power : " << Device.m_Power << ", name : " << Device.m_Name << '\n';
-
-	return outStream;		// TODO: insert return statement here
+	return outStream;
 }
 
-void ElectricDevice::PrintDeviceInfo() const {
+void ElectricDevice::PrintDeviceInfo() const 
+{
 
 	std::cout << *(this);
 }

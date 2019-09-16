@@ -3,75 +3,64 @@
 #ifndef ELECTRIC_NET_H
 #define ELECTRIC_NET_H
 
-#include "ElectricDevice.h"	
 #include <stdexcept>			//header for using exceptions in the [] operator
 
+#include "String.h"
+#include "Vector.h"
+#include "ElectricDevice.h"	
 
-class ElectricNet {
-
-/*constants for ElectricNet class*/
-private:
-	const int POWER_BY_DEFAULT = 500;
-	const int SIZE_BY_DEFAULT = 5;
-
-/*data members*/
-private:
-	int m_MaxPower;			//maximum power of the electric net, an integer in kiloWats
-	int m_ActivePower;		//current power of the electric net, an integer in kiloWats
-
-	int m_MaxNetSize;
-	int m_ConnectedCount;		//the current size of the array
-	ElectricDevice* m_DeviceNet;
-
-	/*helper methods*/
-protected:
-	void ExpandNet();
-	int FindByName(const char* deviceName) const;
-	ElectricDevice* MakeDeviceNet(const ElectricDevice* sourceNet, int maxSize_source, int curentSize_source);
-
+class ElectricNet 
+{
 public:
-	/*constructors*/
 	ElectricNet();
 	ElectricNet(int power);
 	ElectricNet(const ElectricNet& someNet);
 
-	/*destructor*/
 	~ElectricNet();
 
-	/*copy assigment operator*/
 	ElectricNet& operator=(const ElectricNet& someNet);
+
+	bool Empty() const;
+	int NumberOfConnectedDevices() const;
 
 	void PrintNet() const;
 
-	void AddDevice(const ElectricDevice& DeviceToAdd);
-	void RemoveDevice(const char* DeviceName);
+	void AddDevice(const ElectricDevice& deviceToAdd);
+	void RemoveDevice(const String& deviceName);
 
-	ElectricNet& operator+(const ElectricDevice& DeviceToAdd);
-	void operator+=(const ElectricDevice& DeviceToAdd);
+	void IncreaseMaxPowerCapacity();
+	void ReduceMaxPowerCapacity();
 
-	ElectricNet& operator-(const ElectricDevice& DeviceToRemove);
-	void operator-=(const ElectricDevice& DeviceToRemove);
+	// adds a device to the network
+	ElectricNet& operator+(const ElectricDevice& deviceToAdd);
+	void operator+=(const ElectricDevice& deviceToAdd);
 
-	/*checks if there are any connected devices in the net*/
+	// removes a device from the network
+	ElectricNet& operator-(const ElectricDevice& deviceToRemove);
+	void operator-=(const ElectricDevice& deviceToRemove);
+
+	// access a device by its name
+	ElectricDevice& operator[](const char* nameToFind);
+	const ElectricDevice& operator[](const char* nameToFind) const;
+
+	// checks if there are any connected devices in the net
 	bool operator!() const;
 
-	/*prefix ++ that doubles the max power*/
+	// prefix ++ that doubles the max power
 	void operator++();
 
-	/*prefix -- that divides the max power by half, if it is possible*/
+	// prefix -- that divides the max power by half, if it is possible
 	void operator--();
 
-	/*throws exception if there is no EectriclDevice with nameToFind*/
-	ElectricDevice& operator[](const char* nameToFind) const;
+protected:
+	int FindByName(const String& deviceName) const;
 
+private:
+	const int M_POWER_BY_DEFAULT = 500;
 
-
+private:
+	int m_maxPower;							//maximum power of the electric net, an integer in kiloWats
+	int m_activePower;						//current power of the electric net, an integer in kiloWats
+	Vector<ElectricDevice> m_devices;
 };
-
-
 #endif // !ELECTRIC_NET_H
-
-
-
-
-
