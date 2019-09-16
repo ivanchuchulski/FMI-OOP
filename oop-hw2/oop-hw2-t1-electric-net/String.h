@@ -40,8 +40,8 @@ public:
 
 	// operations
 	void Clear();
-	void Insert(size_t index, char symbol);
-	//void Insert(size_t index, size_t count, char symbol);
+	//void Insert(size_t index, char symbol);
+	//void insert(size_t index, size_t count, char symbol);
 	//void Erase(size_t index);
 	void PushBack(char symbol);
 	void PopBack(char symbol);

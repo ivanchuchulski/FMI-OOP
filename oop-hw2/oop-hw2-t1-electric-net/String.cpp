@@ -44,7 +44,7 @@ String::String(const char* str)
 
 String::~String()
 {
-	Clear();
+	ClearContents();
 }
 
 String& String::operator=(const String& other)
@@ -67,6 +67,8 @@ void String::ClearContents()
 {
 	if (m_data != nullptr)
 	{
+	//	std::cout << "cleaning " << m_data << '\n';
+
 		delete[] m_data;
 		m_data = nullptr;
 	}
@@ -93,8 +95,9 @@ void String::CopyOtherString(const String& other)
 
 void String::Grow()
 {
-	int newCapacity = m_capacity * 2;
+	int newCapacity = m_capacity  + (m_capacity / 2);
 	char* newData = new char[static_cast<size_t>(newCapacity) + 1];
+
 	std::memset(m_data, 0, static_cast<size_t>(m_capacity) + 1);
 
 	for (int i = 0; i < Length(); i++)
@@ -136,7 +139,6 @@ char& String::operator[](int index)
 		throw std::out_of_range("error : index out of range\n");
 
 	return m_data[index];
-
 }
 
 const char& String::operator[](int index) const
@@ -220,13 +222,13 @@ void String::Clear()
 	DefaultAllcocate();
 }
 
-void String::Insert(size_t index, char symbol)
-{
-	if (index > Size())
-		throw std::out_of_range("error : Insert, index out of range");
-
-
-}
+//void String::Insert(size_t index, char symbol)
+//{
+//	if (index > Size())
+//		throw std::out_of_range("error : Insert, index out of range");
+//
+//	//TODO
+//}
 
 void String::PushBack(char symbol)
 {
@@ -271,7 +273,7 @@ bool String::operator==(const String& right)
 // friend methods
 std::ostream& operator<<(std::ostream& outStream, const String& str)
 {
-	outStream << str.m_data << '\n';
+	outStream << &str.m_data << ' ' << str.m_data << '\n';
 	
 	return outStream;
 }

@@ -162,12 +162,13 @@ inline void Vector<T>::CopyOtherVector(const Vector<T>& other)
 	m_size = other.Size();
 	m_data = new T[static_cast<size_t>(m_capacity)]{};
 
-	std::memcpy(m_data, other.m_data, static_cast<size_t>(other.Size()) * sizeof(T));
+	for (size_t i = 0; i < other.Size(); i++)
+	{
+		m_data[i] = other.m_data[i];
+	}
 
-	//for (int i = 0; i < other.Size(); i++)
-	//{
-	//	m_data[i] = other.m_data[i];
-	//}
+	// std::memcpy should not be used, because it does shallow copies, it doesn't trigger operator=
+	// std::memcpy(m_data, other.m_data, static_cast<size_t>(other.Size()) * sizeof(T));
 }
 
 template<typename T>
