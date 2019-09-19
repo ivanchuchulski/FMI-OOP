@@ -12,6 +12,7 @@ class Vector
 public:
 	Vector();
 	Vector(const Vector<T>& other);
+	Vector(const int capacity);
 	Vector(int count, const T& value);
 
 	~Vector();
@@ -33,6 +34,7 @@ public:
 	bool Empty() const;
 	int Size() const;
 	int Capacity() const;
+	void Reserve(size_t newCap);
 
 	// modifiers
 	void Clear();
@@ -48,7 +50,7 @@ public:
 		for (int i = 0; i < vec.Size(); i++)
 			outStream << vec.m_data[i] << ' ';
 
-		outStream << '\n';
+		outStream << ' ';
 
 		return outStream;
 	}
@@ -90,6 +92,15 @@ inline Vector<T>::Vector(const Vector<T>& other)
 		DefaultAllocate();
 	else
 		CopyOtherVector(other);
+}
+
+template<typename T>
+inline Vector<T>::Vector(const int capacity)
+	:	m_capacity((capacity > 0) ? capacity : M_CAPACITY_DEFAULT),
+		m_size(0),
+		m_data(nullptr)
+{
+	m_data = new T[static_cast<size_t>(m_capacity)]{};
 }
 
 template<typename T>
@@ -167,23 +178,24 @@ inline void Vector<T>::CopyOtherVector(const Vector<T>& other)
 		m_data[i] = other.m_data[i];
 	}
 
-	// std::memcpy should not be used, because it does shallow copies, it doesn't trigger operator=
+	// !!!std::memcpy does shallow copying and should not be used on objects that have their operator=
 	// std::memcpy(m_data, other.m_data, static_cast<size_t>(other.Size()) * sizeof(T));
 }
 
 template<typename T>
 inline void Vector<T>::Grow()
 {
-	int newCapacity = m_capacity * 2;
-	T* newData = new T[static_cast<size_t>(newCapacity)];
+	m_capacity = m_capacity  + (m_capacity / 2);
+	T* expandedData = new T[static_cast<size_t>(m_capacity)];
 
 	for (int i = 0; i < Size(); i++)
-		newData[i] = m_data[i];
+	{
+		expandedData[i] = m_data[i];
+	}
 
 	delete[] m_data;
 
-	m_capacity = newCapacity;
-	m_data = newData;
+	m_data = expandedData;
 }
 
 template<typename T>
@@ -262,6 +274,26 @@ inline int Vector<T>::Capacity() const
 {
 	return m_capacity;
 }
+
+template<typename T>
+inline void Vector<T>::Reserve(size_t newCap)
+{
+	if (newCap <= m_capacity)
+		return;
+
+	m_capacity = newCap;
+	T* expandedData = new T[static_cast<int>(m_capacity)]{};
+
+	for (int i = 0; i < Size(); i++)
+	{
+		expandedData[i] = m_data[i];
+	}
+
+	delete[] m_data;
+
+	m_data = expandedData;
+}
+
 
 // modifiers
 template<typename T>
