@@ -3,152 +3,98 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-#include <string.h>
+#include <iostream>
+#include "String.h"
 
-
-
-/*		---class Pair definition ---		*/
 template<typename Type>
-class Pair {
-
-/*contansts*/
-private:
-	const char NAME_BY_DEFAULT[8] = "Unknown";
-	const int LENGTH_BY_DEFAULT = 7;
-
-private:
-	char* m_Key;	
-	Type m_Value;		//value is stack allocated 
-
-protected:
-	char* MakeCString(const char* source = nullptr);
+class Pair 
+{
 public:
-	/*constructors*/
 	Pair();
 	Pair(const Pair<Type>& somePair);
-	Pair(const char* key, const Type& value);
+	Pair(const String& key, const Type& value);
 
-	/*destructor*/
 	~Pair();
 
-	/*copy assignment operator*/
 	Pair<Type>& operator=(const Pair<Type>& somePair);
 
-	/*setters*/
 	void SetValue(const Type& value);
-	void SetKey(const char* key);
+	void SetKey(const String& key);
 
-	/*getters*/
-	const char* GetKey() const;
+	String GetKey() const;
 	Type GetValue() const;
 
+	
+	friend std::ostream& operator<<(std::ostream& outStream, const Pair<Type>& pair)
+	{
+		outStream << pair.m_key << ' ' << pair.m_value;
 
+		return outStream;
+	}
+
+private:
+	String m_key;
+	Type m_value;
 };
 
 
-
-/*class Pair method definitions*/
-#pragma region
-
-template<typename Type>
-inline char* Pair<Type>::MakeCString(const char* source) {
-	char* toMakeString = nullptr;
-
-	if (source != nullptr) {
-		int len = strlen(source);
-		toMakeString = new char[len + 1];
-		strcpy_s(toMakeString, len + 1, source);
-
-		return toMakeString;
-	}
-	else {
-		toMakeString = new char[LENGTH_BY_DEFAULT + 1];
-		strcpy_s(toMakeString, LENGTH_BY_DEFAULT + 1, NAME_BY_DEFAULT);
-		
-		return toMakeString;
-	}
-}
-
-
-/*default constructor*/
 template<typename Type>
 inline Pair<Type>::Pair()
-	:	m_Key(MakeCString()), 
-		m_Value()
+	:	m_key(), 
+		m_value()
 {}
 
-/*copy constructor*/
 template<typename Type>
 inline Pair<Type>::Pair(const Pair<Type>& somePair)
-	:	m_Key(MakeCString(somePair.m_Key)),
-		m_Value(somePair.m_Value)
+	:	m_key(somePair.m_key),
+		m_value(somePair.m_value)
 {}
 
-/*constructor with parameters*/
 template<typename Type>
-inline Pair<Type>::Pair(const char * key, const Type & value)
-	:	m_Key(MakeCString(key)), 
-		m_Value(value)
+inline Pair<Type>::Pair(const String& key, const Type& value)
+	:	m_key(key), 
+		m_value(value)
 {}
 
-/*destructor*/
 template<typename Type>
 inline Pair<Type>::~Pair() 
-{
-	if (m_Key != nullptr) {
-		delete[] m_Key;
-	}
-}
-
-
+{}
 
 template<typename Type>
 inline Pair<Type>& Pair<Type>::operator=(const Pair<Type>& somePair)
 {
-	if (this != &(somePair)) {
-		//free dynamic resource
-		if (m_Key != nullptr) {
-			delete[] m_Key;
-		}
-
-		//copy new data
-		m_Key = MakeCString(somePair.m_Key);
-		m_Value = somePair.m_Value;
-
+	if (this != &somePair) 
+	{
+		m_key = somePair.m_key;
+		m_value = somePair.m_value;
 	}
 
-	return *this;// TODO: insert return statement here
+	return *this;
 }
 
 
 template<typename Type>
 inline void Pair<Type>::SetValue(const Type & value)
 {
-	m_Value = value;
-}
-
-/* setter for the key*/
-template<typename Type>
-inline void Pair<Type>::SetKey(const char * key)
-{
-	if (m_Key != nullptr) {
-		delete[] m_Key;
-	}
-	m_Key = MakeCString(key);
+	m_value = value;
 }
 
 template<typename Type>
-inline const char * Pair<Type>::GetKey() const
+inline void Pair<Type>::SetKey(const String& key)
 {
-	return m_Key;
+	m_key = key;
+}
+
+template<typename Type>
+inline String Pair<Type>::GetKey() const
+{
+	return m_key;
 }
 
 template<typename Type>
 inline Type Pair<Type>::GetValue() const
 {
-	return Type(m_Value);
+	return Type(m_value);
 }
-
-#pragma endregion
 
 #endif // !PAIR_H
