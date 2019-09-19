@@ -1,66 +1,70 @@
 #include "Motorcycle.h"
 
-const char BikeTypes[6][14] = {
-	"UndefinedBike",  "Chopper", "Cruiser", "DirtBike", "Touring", "Racing"
-};
+// static members initialization
+const BikeType Motorcycle::M_BIKE_TYPE_DEFAULT = BikeType::UndefinedBike;
+
 
 Motorcycle::Motorcycle()
-	:	Vehicle()
+	:	Vehicle(),
+		m_bikeType(M_BIKE_TYPE_DEFAULT)
 {}
 
-
-Motorcycle::Motorcycle(const Motorcycle & someMotor)
+Motorcycle::Motorcycle(const Motorcycle& someMotor)
 	:	Vehicle(someMotor),
-		m_Type(someMotor.m_Type)
+		m_bikeType(someMotor.m_bikeType)
 {}
 
-Motorcycle::Motorcycle(const Color paint, const int year, const int milege, const char* marque, const char* model, const BikeType type)
-	:	Vehicle(paint, year, milege, marque, model),
-		m_Type(type)
+Motorcycle::Motorcycle(const VehicleColor paint, unsigned productionYear, unsigned mileage, const String& maker, const String& model, const BikeType type)
+	:	Vehicle(paint, productionYear, mileage, maker, model),
+		m_bikeType(type)
 {}
 
 Motorcycle::~Motorcycle()
 {}
 
-Motorcycle & Motorcycle::operator=(const Motorcycle & someMoto)
+Motorcycle & Motorcycle::operator=(const Motorcycle& other)
 {
-	if (this != &(someMoto)) {
-		Vehicle::operator=(someMoto);
+	if (this != &other) 
+	{
+		Vehicle::operator=(static_cast<const Vehicle&>(other));
 
-		m_Type = someMoto.m_Type;
+		m_bikeType = other.m_bikeType;
 	}
 
-	return *this;		// TODO: insert return statement here
+	return *this;
 }
 
 
-std::ostream & operator<<(std::ostream & outStream, const Motorcycle & someMotor)
-{
-	const Vehicle& refToBase = someMotor;
-
-	outStream << "Motorcycle details : \n";
-
-	outStream << refToBase;
-	outStream << "\tbike type : " << BikeTypes[someMotor.m_Type] << '\n';
-
-
-	return outStream;		// TODO: insert return statement here
-}
-
-std::ostream & Motorcycle::Details(std::ostream & outStream) const
-{
-	outStream << *(this);
-
-	return outStream;		// TODO: insert return statement here
-}
-
+// setters
 void Motorcycle::SetBikeType(const BikeType type)
 {
-	m_Type = type;
+	m_bikeType = type;
 }
 
+
+//getters
 int Motorcycle::GetBikeType() const
 {
-	
-	return (int)m_Type;
+	return static_cast<int>(m_bikeType);
+}
+
+
+// virtual override methods
+void Motorcycle::Details() const
+{
+	std::cout << *this << '\n';
+}
+
+
+// friend methods
+std::ostream& operator<<(std::ostream& outStream, const Motorcycle& motorcycle)
+{
+	const String BikeTypes[] = { "UndefinedBike",  "Chopper", "Cruiser", "DirtBike", "Touring", "Racing" };
+
+	outStream << "Motorcycle details : \n";
+	outStream << static_cast<const Vehicle&>(motorcycle) << '\n';
+	outStream << "\tbike type : " << BikeTypes[motorcycle.m_bikeType] << '\n';
+
+
+	return outStream;
 }

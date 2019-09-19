@@ -1,10 +1,12 @@
 #pragma once
 
+#ifndef MOTORCYCLE_H
+#define MOTORCYCLE_H
 
 #include "Vehicle.h"
 
-
-enum BikeType {
+enum BikeType 
+{
 	UndefinedBike = 0,
 	Chopper = 1,
 	Cruiser = 2,
@@ -16,35 +18,32 @@ enum BikeType {
 class Motorcycle 
 	: public Vehicle
 {
-
-/*constant*/
-private:
-	const BikeType BIKE_TYPE_DEFAULT = BikeType::Chopper;
-
-private:
-	BikeType m_Type;
-
 public:
-	/*constructors*/
 	Motorcycle();
 	Motorcycle(const Motorcycle& someMotor);
-	Motorcycle(const Color paint, const int year, const int milege, const char* marque, const char* model, const BikeType type);
+	Motorcycle(const VehicleColor paint, unsigned productionYear, unsigned mileage, const String& maker, const String& model, const BikeType type);
 
-	/*destructor*/
 	~Motorcycle();
 
-	/*copy assignment*/
-	Motorcycle& operator=(const Motorcycle& someMoto);
+	Motorcycle& operator=(const Motorcycle& other);
 
-	void SetBikeType(const BikeType type);
+	//setters
+	void SetBikeType(const BikeType bikeType);
+
+	//getters
 	int GetBikeType() const;
 
-	friend std::ostream& operator<<(std::ostream& outStream, const Motorcycle& someMotor);
+	// virtual override methods
+	virtual void Details() const override;
 
-	/*overriding the virtual method in the base class*/
-	std::ostream& Details(std::ostream& outStream) const override;
+	// friend methods
+	friend std::ostream& operator<<(std::ostream& outStream, const Motorcycle& other);
 
+private:
+	static const BikeType M_BIKE_TYPE_DEFAULT;
 
-
+private:
+	BikeType m_bikeType;
 };
 
+#endif // !MOTORCYCLE_H

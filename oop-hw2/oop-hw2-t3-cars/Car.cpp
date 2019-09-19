@@ -5,45 +5,40 @@ Car::Car()
 	:	Vehicle()
 {}
 
-Car::Car(const Color paint, const int year, const int milege, const char* marque, const char* model)
-		//base constructor with arguments
-	:	Vehicle(paint, year, milege, marque, model)
+Car::Car(const VehicleColor paint, unsigned productionYear, unsigned mileage, const String& maker, const String& model)
+	: Vehicle(paint, productionYear, mileage, maker, model)
 {}
 
 
 Car::Car(const Car & someCar)
-		//calling the copy constructor of base class
 	:	Vehicle(someCar)
 {}
 
 Car::~Car()
 {}
 
-Car& Car::operator=(const Car& someCar)
+Car& Car::operator=(const Car& other)
 {
-	if (this != &(someCar)) {
-		//calling the operator= of Vehicle
-		Vehicle::operator=(someCar);
+	if (this != &other) 
+	{
+		Vehicle::operator=(static_cast<const Vehicle&>(other));
 	}
 
-	return *this;		// TODO: insert return statement here
+	return *this;
 }
 
 
-std::ostream& operator<<(std::ostream& outStream, const Car& someCar)
+// virtual override methods
+void Car::Details() const
 {
-	const Vehicle& refToVeh = someCar;
-
-	outStream << "Car details : \n";
-	outStream << refToVeh;
-
-	return outStream;		// TODO: insert return statement here
+	std::cout << *this << '\n';
 }
 
-std::ostream& Car::Details(std::ostream& outStream) const
+// friend methods
+std::ostream& operator<<(std::ostream& outStream, const Car& car)
 {
-	outStream << *(this);
+	outStream << "Car details :\n";
+	outStream << static_cast<const Vehicle&>(car) << '\n';
 
-	return outStream;		// TODO: insert return statement here
-
+	return outStream;
 }

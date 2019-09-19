@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef TRUCK_H
+#define TRUCK_H
 
 #include "Vehicle.h"
 
@@ -7,33 +9,33 @@ class Truck
 	:	public Vehicle
 {
 
-/*constants*/
-private:
-	const int SIZE_DEFAULT = 20;
-private:
-	int m_Size;		//lenght of the truck in meters
 public:
-	/*constructors*/
 	Truck();
-	Truck(const Color paint, const int year, const int milege, const char* marque, const char* model, const int size);
-	Truck(const Truck& someTruck);
+	Truck(const Truck& other);
+	Truck(const VehicleColor paint, unsigned productionYear, unsigned mileage, const String& maker, const String& model, const unsigned truckLength);
 
-	/*destructor*/
 	~Truck();
 
-	/*copy assignment*/
-	Truck& operator=(const Truck& someTruck);
+	Truck& operator=(const Truck& other);
 
-	void SetSize(const int size);
+	// setters
+	void SetTruckLength(const int truckLength);
 
-	int GetSize() const;
+	//getters
+	int GetTruckLength() const;
 
+	// virtual override methods
+	virtual void Details() const override;
+
+	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const Truck& TruckObj);
 
-	/*overriding the virtual method in the base class*/
-	std::ostream& Details(std::ostream& outStream) const override;
+private:
+	static const int SIZE_DEFAULT;
 
-
+private:
+	int m_truckLength;		// lenght of the truck in meters
 
 };
 
+#endif // !TRUCK_H

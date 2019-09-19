@@ -1,31 +1,27 @@
 #pragma once
+
 #ifndef CAR_H
 #define CAR_H
 
 #include "Vehicle.h"
 
-
 class Car
 	: public Vehicle
 {
-
 public:
-	/*constructors*/
 	Car();
-	Car(const Color paint, const int year, const int milege, const char* marque, const char* model);
-	Car(const Car& someCar);
+	Car(const Car& other);
+	Car(const VehicleColor paint, unsigned productionYear, unsigned mileage, const String& maker, const String& model);
 
-	/*destructor*/
 	~Car();
 
-	/*copy assignment*/
-	Car& operator=(const Car& someCar);
+	Car& operator=(const Car& other);
 
+	// virtual override methods
+	virtual void Details() const override;
+
+	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const Car& someCar);
-
-	/*overriding the virtual method in the base class*/
-	std::ostream& Details(std::ostream& outStream) const override;
-
 };
 
 #endif // !CAR_H
