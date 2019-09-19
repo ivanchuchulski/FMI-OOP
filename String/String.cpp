@@ -90,7 +90,14 @@ void String::CopyOtherString(const String& other)
 	m_data = new char[static_cast<size_t>(m_capacity) + 1] {};
 
 	std::memset(m_data, 0, static_cast<size_t>(m_capacity) + 1);
-	std::memcpy(m_data, other.m_data, (static_cast<size_t>(m_capacity) + 1) * sizeof(char));
+
+//	std::memcpy(m_data, other.m_data, (static_cast<size_t>(m_capacity) + 1) * sizeof(char));
+
+	for (int i = 0; i < m_length; i++)
+	{
+		m_data[i] = other.m_data[i];
+	}
+
 }
 
 void String::Grow()
@@ -253,7 +260,7 @@ void String::Append(char symbol)
 }
 
 // operator overloads
-bool String::operator==(const String& right)
+bool String::operator==(const String& right) const
 {
 	if (Empty() || right.Empty())
 		return false;
@@ -264,7 +271,9 @@ bool String::operator==(const String& right)
 	for (int i = 0; i < Length(); i++)
 	{
 		if (m_data[i] != right.m_data[i])
+		{
 			return false;
+		}
 	}
 
 	return true;
@@ -273,7 +282,11 @@ bool String::operator==(const String& right)
 // friend methods
 std::ostream& operator<<(std::ostream& outStream, const String& str)
 {
-	outStream << &str.m_data << ' ' << str.m_data << '\n';
+
+	auto addr = &(str.m_data);
+	outStream << addr << ' ';
+
+	outStream << str.m_data;
 	
 	return outStream;
 }

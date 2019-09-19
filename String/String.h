@@ -48,7 +48,7 @@ public:
 	void Append(char symbol);
 
 	// operators overload
-	bool operator==(const String& right);
+	bool operator==(const String& right) const;
 
 	//friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const String& str);
@@ -57,9 +57,7 @@ private:
 	void ClearContents();
 	void DefaultAllcocate();
 	void CopyOtherString(const String& other);
-
 	void Grow();
-
 	bool Full() const;
 
 private:
