@@ -1,95 +1,92 @@
 #include "Customer.h"
 
+//static members initialization
+const std::string Customer::M_ID_DEFAULT= "#001";
 
-/*default ctor*/
-Customer::Customer()
-	:	m_ID(ID_DEFAULT),
-		m_Name("no_name"),
-		m_Address("no_address")
+//Customer::Customer()
+//	:	m_id(M_ID_DEFAULT),
+//		m_name("no_name"),
+//		m_address("no_address")
+//{}
+//
+//Customer::Customer(const Customer& someCustomer)
+//	:	m_id(someCustomer.m_id),
+//		m_name(someCustomer.m_name),
+//		m_address(someCustomer.m_address)
+//{}
+
+Customer::Customer(const std::string& id, const std::string& name, const std::string& address)
+	:	m_id(id),
+		m_name(name),
+		m_address(address)
 {}
 
-/*copy ctor*/
-Customer::Customer(const Customer& someCustomer)
-	:	m_ID(someCustomer.m_ID),
-		m_Name(someCustomer.m_Name),
-		m_Address(someCustomer.m_Address)
-{}
-
-/*ctor with parameters*/
-Customer::Customer(const std::string& Id, const std::string& name, const std::string& address)
-	:	m_ID(Id),
-		m_Name(name),
-		m_Address(address)
-{}
-
-/*destructor*/
-Customer::~Customer()
-{
-	//std::string automaticly deletes its data  
-}
-
-/*copy=*/
-Customer & Customer::operator=(const Customer& someCustomer)
-{
-	if (this != &(someCustomer)) 
-	{
-		m_ID = someCustomer.m_ID;
-		m_Name = someCustomer.m_Name;		//copy assignment in std::string class
-		m_Address = someCustomer.m_Address;
-	}
-
-	return *this;		// TODO: insert return statement here
-}
+//Customer::~Customer()
+//{}
+//
+//Customer & Customer::operator=(const Customer& someCustomer)
+//{
+//	if (this != &someCustomer) 
+//	{
+//		m_id = someCustomer.m_id;
+//		m_name = someCustomer.m_name;
+//		m_address = someCustomer.m_address;
+//	}
+//
+//	return *this;
+//}
 
 
+// setters
 void Customer::SetID(const std::string & id)
 {
-	m_ID = id;
+	m_id = id;
 }
 
 void Customer::SetName(const std::string & name)
 {
-	m_Name = name;
+	m_name = name;
 }
 
 void Customer::SetAddress(const std::string & address)
 {
-	m_Address = address;
+	m_address = address;
 }
 
 
-
+// getters
 const std::string Customer::GetID() const
 {
-	return std::string(m_ID);
+	return std::string(m_id);
 }
 
 const std::string Customer::GetName() const
 {
-	return std::string(m_Name);
+	return std::string(m_name);
 }
 
 const std::string Customer::GetAddress() const
 {
-	return std::string(m_Address);
+	return std::string(m_address);
 }
 
-std::ostream& operator<<(std::ostream& outStr, const Customer& someCustomer)
-{
-	outStr << "Customer " << someCustomer.m_Name << " info : ID : "
-			<< someCustomer.m_ID << ", address : " << someCustomer.m_Address << '\n';
- 
+//Customer* Customer::CloneCustomer() const
+//{
+//	return new Customer(*this);
+//}
 
-	return outStr;		// TODO: insert return statement here
-}
-
-void Customer::Display() const
+void Customer::DisplayCustomerInfo() const
 {
 	std::cout << (*this);
 }
 
 
-Customer * Customer::CloneCustomer() const
+// friend methods
+std::ostream& operator<<(std::ostream& outStream, const Customer& customer)
 {
-	return new Customer(*(this));
+	outStream << "Customer " << customer.m_name << " info : ID : "
+		<< customer.m_id << ", address : " << customer.m_address << '\n';
+
+
+	return outStream;
 }

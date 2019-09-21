@@ -1,32 +1,32 @@
 #pragma once
 
-#include "Account.h"		//also includes <string>
+#ifndef CURRENT_ACCOUNT_H
+#define CURRENT_ACCOUNT_H
 
+#include "Account.h"
 
-class CurrentAccount :
-	public Account
+class CurrentAccount 
+	:	public Account
 {
-
 public:
-	/*constructors*/
 	CurrentAccount();
-	CurrentAccount(const CurrentAccount& someCurrent);
-	CurrentAccount(int current_amount, const std::string& owner_id, const std::string& iban);
+	CurrentAccount(const CurrentAccount& other);
+	CurrentAccount(int initialDeposit, const std::string& ownerID, const std::string& iban);
 
-	/*desturctor*/
-	~CurrentAccount();
+	~CurrentAccount() = default;
 
-	/*copy assignment*/
-	CurrentAccount& operator=(const CurrentAccount& someCurrent);
+	CurrentAccount& operator=(const CurrentAccount& other);
 
-	/*overiding the pure virtual mehtods*/
-	void Deposit(int add_ammount) override;
-	bool Withdraw(int request_ammount) override;
-	void DisplayAccount() const override;
+	// pure virtual mehtods overrides
+	virtual Account* CloneAccount() const override;
+	virtual void Deposit(int depositAmmount) override;
+	virtual bool Withdraw(int withdrawAmmount) override;
+	virtual void DisplayAccount() const override;
 
+	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const CurrentAccount& someCurrentAcc);
-
-	Account* CloneWithNew() const override;
-
 };
+
+#endif // !CURRENT_ACCOUNT_H
+
 

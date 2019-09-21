@@ -1,78 +1,64 @@
 #include "CurrentAccount.h"
 
 
-/*default ctor*/
 CurrentAccount::CurrentAccount()
 	:	Account()
 {}
 
-/*copy ctor*/
-CurrentAccount::CurrentAccount(const CurrentAccount & someCurrent)
-	:	Account(someCurrent)
+CurrentAccount::CurrentAccount(const CurrentAccount& other)
+	:	Account(other)
 {}
 
-/*ctor with parameters*/
-CurrentAccount::CurrentAccount(int curent_amount, const std::string & owner_id, const std::string & iban)
-	:	Account(curent_amount, owner_id, iban)
+CurrentAccount::CurrentAccount(int initialDeposit, const std::string & ownerID, const std::string & iban)
+	:	Account(initialDeposit, ownerID, iban)
 {}
 
-/*destuctor*/
 CurrentAccount::~CurrentAccount()
 {}
 
-/*copy=*/
-CurrentAccount & CurrentAccount::operator=(const CurrentAccount & someCurrent)
+CurrentAccount & CurrentAccount::operator=(const CurrentAccount & other)
 {
-	if (this != &(someCurrent)) 
+	if (this != &other) 
 	{
-		Account::operator=(someCurrent);
+		Account::operator=(static_cast<const Account&>(other));
 	}
 
-	return *this;		// TODO: insert return statement here
+	return *this;
 }
 
-
-/*		virtual methods overrides		*/
-
-/*deposit method, adds monet to the current ammount*/
-void CurrentAccount::Deposit(int add_ammount)
+// pure virtual mehtods overrides
+Account* CurrentAccount::CloneAccount() const
 {
-	IncreaseAmmount(add_ammount);
+	return new CurrentAccount(*this);
 }
 
-
-bool CurrentAccount::Withdraw(int request_ammount)
+void CurrentAccount::Deposit(int depositAmmount)
 {
-	if (GetBalance() < request_ammount) {
+	IncreaseAmmount(depositAmmount);
+}
+
+bool CurrentAccount::Withdraw(int withdrawAmmount)
+{
+	if (GetBalance() < withdrawAmmount) 
+	{
 		return false; 
 	}
-	else {
-		DecreaseAmmount(request_ammount);
-		return true;
-	}
-}
 
+	DecreaseAmmount(withdrawAmmount);
+	return true;
+}
 
 void CurrentAccount::DisplayAccount() const
 {
-//	const Account& refToBase = *(this);
-//	std::cout << "account type : Current Account\n" << refToBase << '\n';
-
-	std::cout << *(this) << '\n';
-
+	std::cout << *this << '\n';
 }
 
-std::ostream & operator<<(std::ostream & outStream, const CurrentAccount & someCurrentAcc)
+// friend methods
+std::ostream& operator<<(std::ostream& outStream, const CurrentAccount& currentAccount)
 {
+
 	outStream << "account type : Current Account\n" 
-		<< "\tcurrent ammount : " << someCurrentAcc.GetBalance()
-		<< "\n\townerID : " << someCurrentAcc.GetOwnerID()
-		<< "\n\tIBAN : " << someCurrentAcc.GetIban() << '\n';
+				<< static_cast<const Account&>(currentAccount);
 
-	return outStream;		// TODO: insert return statement here
-}
-
-Account* CurrentAccount::CloneWithNew() const
-{
-	return new CurrentAccount(*(this));
+	return outStream;
 }

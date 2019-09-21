@@ -3,38 +3,34 @@
 #include "Account.h"
 
 class SavingsAccount
-	: public Account
-
+	:	public Account
 {
-private:
-	const float INTEREST_DEFAULT = 1.1f;
-private:
-	float m_InterestRate;		//yearly interest rate
-
 public:
-	/*constructors*/
 	SavingsAccount();
-	SavingsAccount(const SavingsAccount& someSavingsAcc);
+	SavingsAccount(const SavingsAccount& other);
 	SavingsAccount(int curent_amount, const std::string& owner_id, const std::string& iban, float interest);
 
-	/*destructor*/
 	~SavingsAccount();
 
-	/*copy assignment*/
-	SavingsAccount& operator=(const SavingsAccount& someSavingsAcc);
+	SavingsAccount& operator=(const SavingsAccount& other);
 
 	void SetInterest(float interest);
 
 	const float GetInterestRate();
 
-	/*overiding the pure virtual mehtods*/
-	void Deposit(int add_ammount) override;
-	bool Withdraw(int request_ammount) override;
-	void DisplayAccount() const override;
+	// pure virtual mehtods overrides
+	virtual Account* CloneAccount() const override;
+	virtual void Deposit(int add_ammount) override;
+	virtual bool Withdraw(int request_ammount) override;
+	virtual void DisplayAccount() const override;
 
-	friend std::ostream& operator<<(std::ostream& outStream, const SavingsAccount& someSavingsAcc);
+	// friend methods
+	friend std::ostream& operator<<(std::ostream& outStream, const SavingsAccount& savingsAccount);
 
-	Account* CloneWithNew() const override;
+private:
+	const float INTEREST_DEFAULT = 1.1f;
+private:
+	float m_yearlyInterest;
 
 };
 
