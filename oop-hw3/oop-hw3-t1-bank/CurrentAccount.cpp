@@ -27,6 +27,11 @@ CurrentAccount & CurrentAccount::operator=(const CurrentAccount & other)
 }
 
 // pure virtual mehtods overrides
+int CurrentAccount::GetAccountType() const
+{
+	return static_cast<int>(AccountType::CurrentAccount);
+}
+
 Account* CurrentAccount::CloneAccount() const
 {
 	return new CurrentAccount(*this);
@@ -34,7 +39,7 @@ Account* CurrentAccount::CloneAccount() const
 
 void CurrentAccount::Deposit(int depositAmmount)
 {
-	IncreaseAmmount(depositAmmount);
+	IncreaseBalance(depositAmmount);
 }
 
 bool CurrentAccount::Withdraw(int withdrawAmmount)
@@ -44,7 +49,7 @@ bool CurrentAccount::Withdraw(int withdrawAmmount)
 		return false; 
 	}
 
-	DecreaseAmmount(withdrawAmmount);
+	DecreaseBalance(withdrawAmmount);
 	return true;
 }
 

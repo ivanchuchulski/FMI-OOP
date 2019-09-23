@@ -1,19 +1,23 @@
 #include "SavingsAccount.h"
 
 
+// static members initialization
+const float SavingsAccount::M_YEARLY_INTEREST_DEFAULT = 1.1f;
+
+//
 SavingsAccount::SavingsAccount()
 	:	Account(),
-		m_yearlyInterest(INTEREST_DEFAULT)
+		m_yearlyInterestProcent(M_YEARLY_INTEREST_DEFAULT)
 {}
 
 SavingsAccount::SavingsAccount(const SavingsAccount& other)
 	:	Account(other),
-		m_yearlyInterest(other.m_yearlyInterest)
+		m_yearlyInterestProcent(other.m_yearlyInterestProcent)
 {}
 
-SavingsAccount::SavingsAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, float yearlyInterest)
+SavingsAccount::SavingsAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, float yearlyInterestProcent)
 	:	Account(initialDeposit, ownerID, iban),
-		m_yearlyInterest((yearlyInterest >= 0.0f && yearlyInterest <= 100.0f) ? yearlyInterest : INTEREST_DEFAULT)
+		m_yearlyInterestProcent((yearlyInterestProcent >= 0.0f && yearlyInterestProcent <= 100.0f) ? yearlyInterestProcent : M_YEARLY_INTEREST_DEFAULT)
 {}
 
 SavingsAccount::~SavingsAccount()
@@ -23,27 +27,55 @@ SavingsAccount& SavingsAccount::operator=(const SavingsAccount& other)
 {
 	if (this != &other) 
 	{
-		Account::operator=(other);
-		m_yearlyInterest = other.m_yearlyInterest;
+		Account::operator=(static_cast<const Account&>(other));
+		m_yearlyInterestProcent = other.m_yearlyInterestProcent;
 	}
 
 	return *this;
 }
 
-void SavingsAccount::SetInterest(float interest)
+
+// getters
+const float SavingsAccount::GetInterestProcent()
 {
-	if (interest >= 0.0f && interest <= 100.0f) 
-	{
-		m_yearlyInterest = interest;
-	}
+	return m_yearlyInterestProcent;
 }
 
-const float SavingsAccount::GetInterestRate()
+
+// setters
+void SavingsAccount::IncreaseInterest(float interestIncrease)
 {
-	return m_yearlyInterest;
+	if (interestIncrease < 0)
+		return;
+
+	float increasedInterest = m_yearlyInterestProcent + interestIncrease;
+
+	if (increasedInterest > 100)
+		return;
+
+	m_yearlyInterestProcent = increasedInterest;
 }
+
+void SavingsAccount::DecreaseInterest(float interestDecrease)
+{
+	if (interestDecrease > 0)
+		return;
+
+	float decreasedInterest = m_yearlyInterestProcent - interestDecrease;
+	
+	if (decreasedInterest < 0)
+		return;
+
+	m_yearlyInterestProcent = decreasedInterest;
+}
+
 
 // pure virtual mehtods overrides
+int SavingsAccount::GetAccountType() const
+{
+	return static_cast<int>(AccountType::SavingsAccount);
+}
+
 Account* SavingsAccount::CloneAccount() const
 {
 	return new SavingsAccount(*this);
@@ -51,7 +83,7 @@ Account* SavingsAccount::CloneAccount() const
 
 void SavingsAccount::Deposit(int depositAmmount)
 {
-	IncreaseAmmount(depositAmmount);
+	IncreaseBalance(depositAmmount);
 }
 
 bool SavingsAccount::Withdraw(int withdrawAmmount)
@@ -61,7 +93,7 @@ bool SavingsAccount::Withdraw(int withdrawAmmount)
 		return false;
 	}
 
-	DecreaseAmmount(withdrawAmmount);
+	DecreaseBalance(withdrawAmmount);
 	return true;
 }
 
@@ -73,10 +105,9 @@ void SavingsAccount::DisplayAccount() const
 // friend methods
 std::ostream& operator<<(std::ostream& outStream, const SavingsAccount& savingsAccount)
 {
-
 	outStream << "account type : Savings Account\n" 
 		<< static_cast<const Account&>(savingsAccount)
-		<< "\n\tinterst rate : " << savingsAccount.m_yearlyInterest <<  '\n';
+		<< "\n\t" << "interst rate : " << savingsAccount.m_yearlyInterestProcent <<  '\n';
 
 	return outStream;
 }

@@ -1,88 +1,103 @@
 #include "PrivilegeAccount.h"
 
+// static member initialization
+const int PrivilegeAccount::M_OVERDRAFT_DEFAULT = 100;
 
-/*default ctor*/
+//
 PrivilegeAccount::PrivilegeAccount()
 	:	Account(),
-		m_Overdraft(0)
+		m_overdraftOverBalance(0)
 {}
 
-/*copy ctor*/
-PrivilegeAccount::PrivilegeAccount(const PrivilegeAccount& somePrivilAcc)
-	:	Account(somePrivilAcc),
-		m_Overdraft(somePrivilAcc.m_Overdraft)
+PrivilegeAccount::PrivilegeAccount(const PrivilegeAccount& other)
+	:	Account(other),
+		m_overdraftOverBalance(other.m_overdraftOverBalance)
 {}
 
-/*ctor with parameters*/
-PrivilegeAccount::PrivilegeAccount(int current_amount, const std::string& owner_id, const std::string& iban, int overdraft)
-	:	Account(current_amount, owner_id, iban),
-		m_Overdraft((overdraft >= 0)? overdraft : 0)
+PrivilegeAccount::PrivilegeAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, int overdraft)
+	:	Account(initialDeposit, ownerID, iban),
+		m_overdraftOverBalance((overdraft >= 0) ? overdraft : 0)
 {}
 
-/*destructor*/
 PrivilegeAccount::~PrivilegeAccount()
 {}
 
-
-/*copy=*/
-PrivilegeAccount & PrivilegeAccount::operator=(const PrivilegeAccount& somePrivilAcc)
+PrivilegeAccount & PrivilegeAccount::operator=(const PrivilegeAccount& other)
 {
-	if (this != &(somePrivilAcc)) {
-		//copy the new data
-		Account::operator=(somePrivilAcc);
-		m_Overdraft = somePrivilAcc.m_Overdraft;
+	if (this != &other) 
+	{
+		Account::operator=(static_cast<const Account&>(other));
+		m_overdraftOverBalance = other.m_overdraftOverBalance;
 	}
 
-	return *(this);		// TODO: insert return statement here
+	return *this;
 }
 
 
-void PrivilegeAccount::SetOverdraft(int overdraft)
-{
-	m_Overdraft = (overdraft >= 0) ? overdraft : 0;
-}
-
+// getters
 const int PrivilegeAccount::GetOverdraft() const
 {
-	return m_Overdraft;
+	return m_overdraftOverBalance;
 }
 
-void PrivilegeAccount::Deposit(int add_ammount)
+
+// setters
+void PrivilegeAccount::IncreaseOverdraft(int overdraftIncrease)
 {
-	IncreaseAmmount(add_ammount);
+	if (overdraftIncrease < 0)
+		return;
+
+	m_overdraftOverBalance += overdraftIncrease;
 }
 
-bool PrivilegeAccount::Withdraw(int request_ammount)
+void PrivilegeAccount::DecreaseOverdraft(int overdraftDecrease)
 {
-	if (GetBalance() + m_Overdraft < request_ammount) {
+	if (overdraftDecrease > 0)
+		return;
+
+	m_overdraftOverBalance -= overdraftDecrease;
+}
+
+
+// pure virtual mehtods overrides
+int PrivilegeAccount::GetAccountType() const
+{
+	return static_cast<int>(AccountType::PrivileAccount);
+}
+
+Account* PrivilegeAccount::CloneAccount() const
+{
+	return new PrivilegeAccount(*this);
+}
+
+void PrivilegeAccount::Deposit(int depositAmmount)
+{
+	IncreaseBalance(depositAmmount);
+}
+
+bool PrivilegeAccount::Withdraw(int withdrawAmmount)
+{
+	if (GetBalance() + m_overdraftOverBalance < withdrawAmmount) 
+	{
 		return false;
 	}
-	else {
-		DecreaseAmmount(request_ammount);
-		return true;
-	}
-}
 
+	DecreaseBalance(withdrawAmmount);
+	return true;
+}
 
 void PrivilegeAccount::DisplayAccount() const
 {
-	std::cout << *(this) << '\n';
+	std::cout << *this << '\n';
 }
 
 
-std::ostream & operator<<(std::ostream & outStream, const PrivilegeAccount & somePrivilAcc)
+// friend methods
+std::ostream& operator<<(std::ostream& outStream, const PrivilegeAccount& privilegedAccount)
 {
 	outStream << "account type : Privileged Account\n"
-		<< "\tcurrent ammount : " << somePrivilAcc.GetBalance()
-		<< "\n\townerID : " << somePrivilAcc.GetOwnerID()
-		<< "\n\tIBAN : " << somePrivilAcc.GetIban()
-		<< "\n\toverdraft : " << somePrivilAcc.m_Overdraft << '\n';
+		<< static_cast<const Account&>(privilegedAccount)
+		<< "\n\t" << "overdraft : " << privilegedAccount.m_overdraftOverBalance << '\n';
 
-
-	return outStream;		// TODO: insert return statement here
-}
-
-Account * PrivilegeAccount::CloneWithNew() const
-{
-	return new PrivilegeAccount(*(this));
+	return outStream;
 }

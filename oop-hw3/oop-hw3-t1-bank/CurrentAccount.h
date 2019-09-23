@@ -17,7 +17,8 @@ public:
 
 	CurrentAccount& operator=(const CurrentAccount& other);
 
-	// pure virtual mehtods overrides
+	// pure virtual mehtods 
+	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;
 	virtual void Deposit(int depositAmmount) override;
 	virtual bool Withdraw(int withdrawAmmount) override;

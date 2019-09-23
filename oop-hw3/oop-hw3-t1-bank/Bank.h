@@ -3,8 +3,6 @@
 #ifndef BANK_H
 #define BANK_H
 
-
-
 #include <vector>
 #include <functional>		// std::invoke
 
@@ -13,17 +11,6 @@
 #include "CurrentAccount.h"	
 #include "SavingsAccount.h"
 #include "PrivilegeAccount.h"
-
-
-namespace acc 
-{
-	enum  AccountTypes : unsigned int
-	{
-		ACurrentAccount = 0,
-		ASavingsAccount = 1,
-		APrivilegeAccount = 2
-	};
-}
 
 class Bank 
 {
@@ -49,7 +36,7 @@ public:
 	void DeleteCustomer(const std::string& customer_id);
 
 	// account modifiers
-	void AddAccount(acc::AccountTypes accountType, int amount, const std::string& owner_id, const std::string& iban);
+	void AddAccount(AccountType accountType, int amount, const std::string& owner_id, const std::string& iban);
 	void DeleteAccount(const std::string& iban);
 
 	// bank money operations
@@ -61,15 +48,15 @@ public:
 	void ListCustomers() const;
 	void ListAccounts() const;
 	void ListCustomerAccount(const std::string& customer_id) const;
-	void DisplayBank() const;
-
 	void PrintSupportedAccountTypes() const;
+	void DisplayBank() const;
 
 	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const Bank& someBank);
 
 private:
-	bool HasCustomers() const;
+	bool NoRegisteredCustomers() const;
+	bool HasNoAccountOpened() const;
 
 	//method to copy the data in the vectors correctly
 	template<typename Type>

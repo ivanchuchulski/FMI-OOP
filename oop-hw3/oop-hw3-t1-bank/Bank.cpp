@@ -46,9 +46,14 @@ Bank& Bank::operator=(const Bank& other)
 
 
 // private helper methods
-bool Bank::HasCustomers() const
+bool Bank::NoRegisteredCustomers() const
 {
-	return !m_customers.empty();
+	return m_customers.empty();
+}
+
+bool Bank::HasNoAccountOpened() const
+{
+	return m_accounts.empty();
 }
 
 template<typename Type>
@@ -95,7 +100,7 @@ int Bank::FindAccountByIBAN(const std::string& accountIBAN) const
 {
 	for (size_t i = 0; i < m_accounts.size(); i++)
 	{
-		if (m_accounts[i]->GetIban() == accountIBAN) 
+		if (m_accounts[i]->GetAccountIBAN() == accountIBAN) 
 		{
 			return i;
 		}
@@ -146,7 +151,7 @@ void Bank::AddCustomer(const std::string& customerID, const std::string& custome
 
 void Bank::DeleteCustomer(const std::string& customerID)
 {
-	if (!HasCustomers()) 
+	if (NoRegisteredCustomers()) 
 	{
 		std::cout << "removal failed : no customers to delete\n";
 		return;
@@ -179,7 +184,7 @@ void Bank::DeleteCustomer(const std::string& customerID)
 // account modifiers
 void Bank::AddAccount(acc::AccountTypes accountType, int amount, const std::string& customerID, const std::string& ownedIBAN)
 {
-	if (!HasCustomers())
+	if (NoRegisteredCustomers())
 	{
 		std::cout << "account addition failed : the bank has no customers\n";
 		return;
@@ -230,7 +235,7 @@ void Bank::AddAccount(acc::AccountTypes accountType, int amount, const std::stri
 
 void Bank::DeleteAccount(const std::string& accountIBAN)
 {
-	if (!HasCustomers())
+	if (NoRegisteredCustomers())
 	{
 		std::cout << "account removal failed : the bank has no customers\n";
 		return;
@@ -331,7 +336,7 @@ bool Bank::WithdrawFromAccount(const std::string& withdraw_from_iban, int reques
 // bank information 
 void Bank::ListCustomers() const
 {
-	if (!HasCustomers())
+	if (NoRegisteredCustomers())
 	{
 		std::cout << "bank has no customers to display\n";
 		return;
@@ -346,19 +351,20 @@ void Bank::ListCustomers() const
 
 void Bank::ListAccounts() const
 {
-	if (!HasCustomers())
+	if (NoRegisteredCustomers())
 	{
 		std::cout << "bank has no customers";
 		return;
 	}
 
-	if (m_accounts.empty()) 
+	if (HasNoAccountOpened()) 
 	{
 		std::cout << "the bank has no accounts\n";
 		return;
 	}
 
 	std::cout << "Printing bank accounts : \n";
+
 	for (auto account : m_accounts)
 	{
 		account->DisplayAccount();
@@ -367,7 +373,7 @@ void Bank::ListAccounts() const
 
 void Bank::ListCustomerAccount(const std::string& customerID) const
 {
-	if (!HasCustomers())
+	if (NoRegisteredCustomers())
 	{
 		std::cout << "the bank has no customers\n";
 		return;
@@ -381,7 +387,7 @@ void Bank::ListCustomerAccount(const std::string& customerID) const
 		return;
 	}
 
-	if (m_accounts.empty())
+	if (HasNoAccountOpened())
 	{
 		std::cout << "bank has no accounts\n";
 		return;
@@ -396,19 +402,21 @@ void Bank::ListCustomerAccount(const std::string& customerID) const
 	}
 }
 
-void Bank::DisplayBank() const
-{
-	std::cout << *(this) << '\n';
-}
-
 void Bank::PrintSupportedAccountTypes() const
 {
-	std::cout << "0 <-> CurrentAccount || (1) <-> Savings Account || (2) <-> Privileged Account\n";
+	std::cout << static_cast<int>(AccountType::CurrentAccount) << " <-> CurrentAccount "
+				<< static_cast<int>(AccountType::SavingsAccount) << " <-> Savings Account "
+				<< static_cast<int>(AccountType::PrivileAccount) << " <-> Privileged Account\n";
+}
+
+void Bank::DisplayBank() const
+{
+	std::cout << *this << '\n';
 }
 
 
 // friend methods
-std::ostream & operator<<(std::ostream& outStream, const Bank& someBank)
+std::ostream& operator<<(std::ostream& outStream, const Bank& someBank)
 {
 	outStream << "\nBank " << someBank.GetName() << " info : \n"
 		<< "\taddress : " << someBank.GetAddress();

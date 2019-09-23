@@ -8,29 +8,34 @@ class SavingsAccount
 public:
 	SavingsAccount();
 	SavingsAccount(const SavingsAccount& other);
-	SavingsAccount(int curent_amount, const std::string& owner_id, const std::string& iban, float interest);
+	SavingsAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, float yearlyInterestProcent	);
 
 	~SavingsAccount();
 
 	SavingsAccount& operator=(const SavingsAccount& other);
 
-	void SetInterest(float interest);
+	// getters
+	const float GetInterestProcent();
 
-	const float GetInterestRate();
+	// setters
+	void IncreaseInterest(float interest);
+	void DecreaseInterest(float interest);
 
 	// pure virtual mehtods overrides
+	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;
-	virtual void Deposit(int add_ammount) override;
-	virtual bool Withdraw(int request_ammount) override;
+	virtual void Deposit(int depositAmmount) override;
+	virtual bool Withdraw(int withdrawAmmount) override;
 	virtual void DisplayAccount() const override;
 
 	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const SavingsAccount& savingsAccount);
 
 private:
-	const float INTEREST_DEFAULT = 1.1f;
+	static const float M_YEARLY_INTEREST_DEFAULT;
+
 private:
-	float m_yearlyInterest;
+	float m_yearlyInterestProcent;
 
 };
 
