@@ -1,6 +1,9 @@
 #include "Bank.h"
 
+#include <algorithm>
 
+
+//
 Bank::Bank()
 	:	m_bankName("the anonymous bank"),	
 		m_bankAddress("hidden address"),
@@ -14,7 +17,7 @@ Bank::Bank(const Bank& other)
 		m_customers(other.m_customers),
 		m_accounts()
 {
-	CopyVectorOfPointers<Account>(m_accounts, other.m_accounts, &Account::CloneAccount);	
+	CopyAccounts(other.m_accounts);
 }
 
 Bank::Bank(const std::string& bankName, const std::string& bankAddress)
@@ -26,19 +29,15 @@ Bank::Bank(const std::string& bankName, const std::string& bankAddress)
 
 Bank::~Bank()
 {
-	ClearVectorOfPointers<Account>(m_accounts);
+	ClearAccounts();
 }
 
 Bank& Bank::operator=(const Bank& other)
 {
 	if (this != &other) 
 	{
-		ClearVectorOfPointers(m_accounts);
-
-		m_bankName = other.m_bankName;
-		m_bankAddress = other.m_bankAddress;
-		m_customers = other.m_customers;
-		CopyVectorOfPointers<Account>(m_accounts, other.m_accounts, &Account::CloneAccount);
+		ClearBank();
+		CopyOtherBank(other);
 	}
 
 	return *this;
@@ -46,69 +45,81 @@ Bank& Bank::operator=(const Bank& other)
 
 
 // private helper methods
+void Bank::ClearAccounts()
+{
+	// deleting the data pointed by the pointers, using a pointer reference to be able to do the assignment to nullptr correctly
+	for (Account*& account : m_accounts)
+	{
+		delete account;
+		account = nullptr;
+	}
+
+	// clearing the pointers that the vector holds
+	m_accounts.clear();
+}
+
+void Bank::CopyAccounts(const std::vector<Account*>& otherAccounts)
+{
+	for (const Account* account : otherAccounts)
+	{
+		m_accounts.emplace_back(account->CloneAccount());
+	}
+}
+
+void Bank::ClearBank()
+{
+	m_bankName.clear();
+	m_bankAddress.clear();
+	m_customers.clear();
+	ClearAccounts();
+}
+
+void Bank::CopyOtherBank(const Bank& otherBank)
+{
+	m_bankName = otherBank.m_bankName;
+	m_bankAddress = otherBank.m_bankAddress;
+	m_customers = otherBank.m_customers;
+	CopyAccounts(otherBank.m_accounts);
+}
+
 bool Bank::NoRegisteredCustomers() const
 {
 	return m_customers.empty();
 }
 
-bool Bank::HasNoAccountOpened() const
+bool Bank::NoAccountsOpened() const
 {
 	return m_accounts.empty();
 }
 
-template<typename Type>
-void Bank::ClearVectorOfPointers(std::vector<Type*>& vec)
+std::vector<Customer>::const_iterator Bank::FindByCustomerID(const std::string& customerID) const
 {
-	//deleting the data pointed by the pointers
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		delete vec[i];
-	}
-
-	//clearing the pointers that the vector holds
-	vec.clear();
+	return std::find(m_customers.begin(), m_customers.end(), customerID);
 }
 
-template<typename Type>
-void Bank::CopyVectorOfPointers(std::vector<Type*>& destination, const std::vector<Type*>& source, Type* (Type::* CloningMethod)() const)
+std::vector<Account*>::const_iterator Bank::FindAccountByIBAN(const std::string& accountIBAN) const
 {
-	//for (size_t index = 0; index < source.size(); index++)
-	//{
-	//	destination.emplace_back((source[index]->*CloningMethod)());
-	//}
-
-	for (auto sourceAccount : source)
+	for (auto accountIt = m_accounts.begin(); accountIt != m_accounts.end(); ++accountIt)
 	{
-		destination.emplace_back(sourceAccount->*CloningMethod()));
-	}
-}
-
-int Bank::FindByCustomerID(const std::string& customerID) const
-{
-	for (size_t i = 0; i < m_customers.size(); i++)
-	{
-		if (m_customers[i].GetID() == customerID)
+		if (accountIt->GetOwnerID() == accountIBAN)
 		{
-			return i;
+			return m_accounts.begin() + accountIt;
 		}
 	}
 
-	return -1;
+	// if nothing found
+	return m_accounts.end();
 }
 
-int Bank::FindAccountByIBAN(const std::string& accountIBAN) const
+bool Bank::AccountOpened(const std::vector<Account*>::const_iterator accountIt) const
 {
-	for (size_t i = 0; i < m_accounts.size(); i++)
-	{
-		if (m_accounts[i]->GetAccountIBAN() == accountIBAN) 
-		{
-			return i;
-		}
-	}
-
-	return -1;
+	return accountIt != m_accounts.end();
 }
 
+bool Bank::CustomerRegistered(const std::vector<Customer>::const_iterator customerIt) const
+{
+	return customerIt != m_customers.end();
+}
 
 //setters
 void Bank::ChangeBankName(const std::string& name) 
@@ -137,11 +148,12 @@ const std::string Bank::GetAddress() const
 // customer modifiers
 void Bank::AddCustomer(const std::string& customerID, const std::string& customerName, const std::string& customerAddress)
 {
-	int foundIndex = FindByCustomerID(customerID);
+	auto customerToAddIt = FindByCustomerID(customerID);
 
-	if (foundIndex != -1)
+	if (CustomerRegistered(customerToAddIt))
 	{
 		std::cout << "customer addition failed : customer " << customerName << " already exists\n";
+		return;
 	}
 
 	m_customers.emplace_back(Customer(customerID, customerName, customerAddress));
@@ -157,15 +169,15 @@ void Bank::DeleteCustomer(const std::string& customerID)
 		return;
 	}
 
-	int foundIndex = FindByCustomerID(customerID);
+	auto customerToRemoveIt = FindByCustomerID(customerID);
 
-	if (foundIndex == -1) 
+	if (!CustomerRegistered(customerToRemoveIt)) 
 	{
 		std::cout << "removal failed : customer id not found\n";
 		return;
 	}
 
-	//first removing all the accounts for that customer
+	// first removing all the accounts for that customer
 	for (size_t i = 0; i < m_accounts.size(); i++)
 	{
 		if (m_accounts[i]->GetOwnerID() == customerID) 
@@ -175,14 +187,14 @@ void Bank::DeleteCustomer(const std::string& customerID)
 		}
 	}
 
-	//then delete the customer
-	m_customers.erase(m_customers.begin() + foundIndex);
+	// then delete the customer
+	m_customers.erase(customerToRemoveIt);
 	std::cout << "customer removal success!\n";
 }
 
 
 // account modifiers
-void Bank::AddAccount(acc::AccountTypes accountType, int amount, const std::string& customerID, const std::string& ownedIBAN)
+void Bank::AddAccount(const std::string& customerID, const AccountType accountType)
 {
 	if (NoRegisteredCustomers())
 	{
@@ -190,46 +202,49 @@ void Bank::AddAccount(acc::AccountTypes accountType, int amount, const std::stri
 		return;
 	}
 
-	int customerIndex = FindByCustomerID(customerID);
-	if (customerIndex == -1)
+	auto customerIndexIt = FindByCustomerID(customerID);
+	if (!CustomerRegistered(customerIndexIt))
 	{
 		std::cout << "account addition failed : the customer doesn't exist\n";
 		return;
 	}
 
-	int ibanIndex = FindAccountByIBAN(ownedIBAN);
-	if (ibanIndex == -1)
-	{
-		std::cout << "account addition failed : the customer doesn't exist\n";
-		return;
-	}
-
-
+	Account* temp = nullptr;
 
 	switch (accountType)
 	{
-		case acc::AccountTypes::ACurrentAccount :
-			m_accounts.emplace_back(new CurrentAccount(amount, customerID, ownedIBAN));
+		case AccountType::CurrentAccount :
+			temp = new CurrentAccount();
 			break;
 
-		case acc::AccountTypes::ASavingsAccount :
-			float interest = 0.0f;
-			std::cout << "Please enter a interest for the Savings Account :";
-			std::cin >> interest;
-			m_accounts.emplace_back(new SavingsAccount(amount, customerID, ownedIBAN, interest));
+		case AccountType::SavingsAccount :
+			temp = new SavingsAccount();
 			break;
 
-		case acc::AccountTypes::APrivilegeAccount:
-			int overdraft = 0;
-			std::cout << "Please enter a overdraft for the Privilege Account :";
-			std::cin >> overdraft;
-			m_accounts.emplace_back(new PrivilegeAccount(amount, customerID, ownedIBAN, overdraft));
+		case AccountType::PrivileAccount :
+			temp = new PrivilegeAccount();
 			break;
 
-		default:
-			break;
+		default :
+			std::cout << "error : invalid account type\n";
+			return;
 	}
 
+	temp->InputAccount(customerID);
+
+	auto ibanIndex = FindAccountByIBAN(temp->GetAccountIBAN());
+
+	if (AccountOpened(ibanIndex))
+	{
+		std::cout << "account addition failed : account with such IBAN already exists\n";
+	}
+	else
+	{
+		m_accounts.emplace_back(temp->CloneAccount());
+	}
+
+	delete temp;
+	
 	std::cout << "account addition success\n";
 }
 
@@ -241,22 +256,22 @@ void Bank::DeleteAccount(const std::string& accountIBAN)
 		return;
 	}
 
-	if (m_accounts.empty())
+	if (NoAccountsOpened())
 	{
 		std::cout << "account removal failed : the bank has no accounts\n";
 		return;
 	}
 
-	int ibanIndex = FindAccountByIBAN(accountIBAN);
+	auto ibanIndex = FindAccountByIBAN(accountIBAN);
 
-	if (ibanIndex == -1)
+	if (!AccountOpened(ibanIndex))
 	{
-		std::cout << "account removal failed : no account with such id exists\n";
+		std::cout << "account removal failed : no account with IBAN " << accountIBAN << " exists\n";
 		return;
 	}
 
-	delete m_accounts[ibanIndex];
-	m_accounts.erase(m_accounts.begin() + ibanIndex);
+	delete m_accounts[ibanIndex - m_accounts.begin()];
+	m_accounts.erase(ibanIndex);
 
 	std::cout << "account removal success\n";
 }
@@ -264,73 +279,87 @@ void Bank::DeleteAccount(const std::string& accountIBAN)
 // bank money operations
 void Bank::Transfer(const std::string& fromIBAN, const std::string& toIBAN, int ammount)
 {
-	if (m_customers.empty() == true || m_accounts.empty() == true)
+	if (NoRegisteredCustomers())
 	{
+		std::cout << "the bank has no customers\n";
 		return;
 	}
 
-	int fromIndex = FindAccountByIBAN(fromIBAN);
-	int toIndex = FindAccountByIBAN(toIBAN);
-
-	//checks
-	if (fromIndex = -1 || toIndex == -1) {
-		std::cout << "Can not find such accounts!\n";
-		return;
-	}
-	else if (fromIndex == toIndex) {
-		std::cout << "No need to transfer to self!\n";
+	if (NoAccountsOpened())
+	{
+		std::cout << "bank has no accounts\n";
 		return;
 	}
 
+	auto fromAccountIt = FindAccountByIBAN(fromIBAN);
+	auto toAccountIt = FindAccountByIBAN(toIBAN);
 
-	bool withdraw_success = m_accounts[fromIndex]->Withdraw(ammount);
+	if (!AccountOpened(fromAccountIt))
+	{
+		std::cout << "error : account to transfer from doesn't exist\n";
+		return;
+	}
 
-	if (withdraw_success == false) {
+	if (!AccountOpened(toAccountIt))
+	{
+		std::cout << "error : account to transfer to doesn't exist\n";
+		return;
+	}
+	
+	if (fromAccountIt == toAccountIt)
+	{
+		std::cout << "error : source and destination IBANs are the same\n";
+		return;
+	}
+
+	bool withdrawSuccessful = m_accounts[fromAccountIt - m_accounts.begin()]->Withdraw(ammount);
+
+	if (!withdrawSuccessful) 
+	{
 		std::cout << "Can not withraw that ammount from the account!\n";
 		return;
 	}
-	else {
-		m_accounts[toIndex]->Deposit(ammount);
-		std::cout << "Transfer succeessful!\n";
-	}
 
+	m_accounts[toAccountIt - m_accounts.begin()]->Deposit(ammount);
+
+	std::cout << "Transfer succeessful!\n";
 }
 
-void Bank::DepositToAccount(const std::string& deposit_to_iban, int add_ammount)
+void Bank::DepositToAccount(const std::string& accountIBAN, int depositAmmount)
 {
-	int foundIndex = FindAccountByIBAN(deposit_to_iban);
+	auto foundIndex = FindAccountByIBAN(accountIBAN);
 
-	if (foundIndex == -1) {
-		std::cout << "Can not find such account!\n";
+	if (!AccountOpened(foundIndex)) 
+	{
+		std::cout << "depoit failed : account doesn't exist\n";
 		return;
 	}
 
-	m_accounts[foundIndex]->Deposit(add_ammount);
-	std::cout << "Account deposition success!\n";
+	m_accounts[foundIndex - m_accounts.begin()]->Deposit(depositAmmount);
 
+	std::cout << "account deposit success\n";
 }
 
-bool Bank::WithdrawFromAccount(const std::string& withdraw_from_iban, int request_ammount)
+bool Bank::WithdrawFromAccount(const std::string& accountIBAN, int withdrawAmmount)
 {
-	int foundIndex = FindAccountByIBAN(withdraw_from_iban);
+	auto foundIndex = FindAccountByIBAN(accountIBAN);
 
-	if (foundIndex == -1) {
-		std::cout << "Can not find such account!\n";
+	if (!AccountOpened(foundIndex)) 
+	{
+		std::cout << "withdraw failed : account doesn't exist\n";
 		return false;
 	}
 
+	bool withdrawSuccessful = m_accounts[foundIndex - m_accounts.begin()]->Withdraw(withdrawAmmount);
 
-	bool withdraw_success = m_accounts[foundIndex]->Withdraw(request_ammount);
-
-	if (withdraw_success == false) {
-		std::cout << "Can not withraw that ammount from the account!\n";
+	if (!withdrawSuccessful) 
+	{
+		std::cout << "withraw failed : withraw ammount is to high\n";
 		return false;
 	}
-	else {
-		std::cout << "Account withdrawing success!\n";
-		return true;
-	}
 
+	std::cout << "withdraw success\n";
+	return true;
 }
 
 // bank information 
@@ -357,7 +386,7 @@ void Bank::ListAccounts() const
 		return;
 	}
 
-	if (HasNoAccountOpened()) 
+	if (NoAccountsOpened()) 
 	{
 		std::cout << "the bank has no accounts\n";
 		return;
@@ -365,7 +394,7 @@ void Bank::ListAccounts() const
 
 	std::cout << "Printing bank accounts : \n";
 
-	for (auto account : m_accounts)
+	for (const Account* account : m_accounts)
 	{
 		account->DisplayAccount();
 	}
@@ -379,15 +408,15 @@ void Bank::ListCustomerAccount(const std::string& customerID) const
 		return;
 	}
 
-	int idIndex = FindByCustomerID(customerID);
+	auto idIndex = FindByCustomerID(customerID);
 
-	if (idIndex == -1) 
+	if (!CustomerRegistered(idIndex)) 
 	{
 		std::cout << "customer id not found\n";
 		return;
 	}
 
-	if (HasNoAccountOpened())
+	if (NoAccountsOpened())
 	{
 		std::cout << "bank has no accounts\n";
 		return;

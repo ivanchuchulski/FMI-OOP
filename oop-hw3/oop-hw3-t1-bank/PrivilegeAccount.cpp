@@ -59,6 +59,15 @@ void PrivilegeAccount::DecreaseOverdraft(int overdraftDecrease)
 }
 
 
+// virtual methods
+void PrivilegeAccount::InputAccount(const std::string& ownerID)
+{
+	Account::InputAccount(ownerID);
+
+	std::cout << "enter overdraft : ";
+	std::cin >> m_overdraftOverBalance;
+}
+
 // pure virtual mehtods overrides
 int PrivilegeAccount::GetAccountType() const
 {

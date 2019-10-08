@@ -24,6 +24,9 @@ public:
 	void IncreaseOverdraft(int overdraftIncrease);
 	void DecreaseOverdraft(int overdraftDecrease);
 
+	// virtual methods
+	virtual void InputAccount(const std::string& ownerID) override;
+
 	// pure virtual mehtods overrides
 	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;

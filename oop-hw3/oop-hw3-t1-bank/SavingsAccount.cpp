@@ -70,6 +70,16 @@ void SavingsAccount::DecreaseInterest(float interestDecrease)
 }
 
 
+// virtual methods
+void SavingsAccount::InputAccount(const std::string& ownerID)
+{
+	Account::InputAccount(ownerID);
+
+	std::cout << "enter yealy interest : ";
+	std::cin >> m_yearlyInterestProcent;
+}
+
+
 // pure virtual mehtods overrides
 int SavingsAccount::GetAccountType() const
 {

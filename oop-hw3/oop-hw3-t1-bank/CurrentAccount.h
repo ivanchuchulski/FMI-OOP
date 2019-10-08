@@ -17,6 +17,9 @@ public:
 
 	CurrentAccount& operator=(const CurrentAccount& other);
 
+	// virtual methods
+	virtual void InputAccount(const std::string& ownerID) override;
+
 	// pure virtual mehtods 
 	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;
@@ -25,7 +28,8 @@ public:
 	virtual void DisplayAccount() const override;
 
 	// friend methods
-	friend std::ostream& operator<<(std::ostream& outStream, const CurrentAccount& someCurrentAcc);
+	friend std::ostream& operator<<(std::ostream& outStream, const CurrentAccount& currentAccount);
+	friend std::istream& operator>>(std::istream& inStream, CurrentAccount& currentAccount);
 };
 
 #endif // !CURRENT_ACCOUNT_H

@@ -21,6 +21,9 @@ public:
 	void IncreaseInterest(float interest);
 	void DecreaseInterest(float interest);
 
+	// virtual methods
+	virtual void InputAccount(const std::string& ownerID) override;
+
 	// pure virtual mehtods overrides
 	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;

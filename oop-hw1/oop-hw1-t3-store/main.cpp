@@ -15,10 +15,10 @@ int main()
 	Menu storeMenu("AXCD?Q");
 	Store* MiceStore = new Store();
 
-	storeMenu.ShowMenu();
-
 	do 
 	{
+		storeMenu.ShowMenu();
+
 		userCommand = storeMenu.GetCommand();
 
 		switch (userCommand) 
@@ -41,10 +41,6 @@ int main()
 
 			case '?' :
 				storeMenu.ShowMenu();
-				break;
-
-			case 'Q':
-				//this is the exit condition
 				break;
 		}
 	} while (userCommand != 'Q');

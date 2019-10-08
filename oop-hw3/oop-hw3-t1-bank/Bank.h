@@ -32,17 +32,17 @@ public:
 	const std::string GetAddress() const;
 
 	// customer modifiers
-	void AddCustomer(const std::string& customer_id, const std::string& name, const std::string& address);
+	void AddCustomer(const std::string& customerID, const std::string& name, const std::string& address);
 	void DeleteCustomer(const std::string& customer_id);
 
 	// account modifiers
-	void AddAccount(AccountType accountType, int amount, const std::string& owner_id, const std::string& iban);
+	void AddAccount(const std::string& ownerID, const AccountType accountType);
 	void DeleteAccount(const std::string& iban);
 
 	// bank money operations
 	void Transfer(const std::string& fromIBAN, const std::string& toIBAN, int ammount);
-	void DepositToAccount(const std::string& deposit_to_iban, int add_ammount);
-	bool WithdrawFromAccount(const std::string& withdraw_from_iban, int request_ammount);
+	void DepositToAccount(const std::string& accountIBAN, int depositAmmount);
+	bool WithdrawFromAccount(const std::string& accountIBAN, int withdrawAmmount);
 
 	// bank information
 	void ListCustomers() const;
@@ -55,19 +55,20 @@ public:
 	friend std::ostream& operator<<(std::ostream& outStream, const Bank& someBank);
 
 private:
+	void ClearAccounts();
+	void CopyAccounts(const std::vector<Account*>& otherAccounts);
+	
+	void ClearBank();
+	void CopyOtherBank(const Bank& otherBank);
+
 	bool NoRegisteredCustomers() const;
-	bool HasNoAccountOpened() const;
+	bool NoAccountsOpened() const;
+	
+	std::vector<Customer>::const_iterator FindByCustomerID(const std::string& customerID) const;
+	std::vector<Account*>::const_iterator FindAccountByIBAN(const std::string& accountIBAN) const;
 
-	//method to copy the data in the vectors correctly
-	template<typename Type>
-	void CopyVectorOfPointers(std::vector<Type*>& dest, const std::vector<Type*>& othervec_source, Type* (Type::* CloningMethod)() const);
-
-	//mehtod to clear the pointers in the vectors
-	template<typename Type>
-	void ClearVectorOfPointers (std::vector<Type*>& vec);
-
-	int FindByCustomerID(const std::string& customerID) const;
-	int FindAccountByIBAN(const std::string& accountIBAN) const;
+	bool AccountOpened(const std::vector<Account*>::const_iterator accountIt) const;	
+	bool CustomerRegistered(const std::vector<Customer>::const_iterator customerIt) const;
 
 private:
 	std::string m_bankName;

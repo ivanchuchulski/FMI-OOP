@@ -4,31 +4,26 @@
 #define MENU_H
 
 #include <string>
-
+#include <vector>
 
 class Menu
 {
 public:
 	Menu() = default;
-	Menu(std::string legalCommands);
+	Menu(std::vector<int> legalCommands);
 	Menu(const Menu&) = default;
 	~Menu() = default;
-
 	Menu& operator=(const Menu&) = default;
 
-	void ShowMenu();
+	void ShowMenu() const;
 
-	char GetCommand();
-
-private:
-	char ConvertToUpperCase(char symbol);
-	char ExtractSymbol();
-
-	bool LegalCommand(char symbol);
+	int GetCommand() const;
 
 private:
-	std::string m_LegalCommands;
+	int SafetyInputIntegerInBounds(const int lowerBound, const int upperBound) const;
 
+private:
+	std::vector<int> m_legalCommands;
 };
 
 

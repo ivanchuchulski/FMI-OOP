@@ -26,6 +26,14 @@ CurrentAccount & CurrentAccount::operator=(const CurrentAccount & other)
 	return *this;
 }
 
+
+// virtual methods
+void CurrentAccount::InputAccount(const std::string& ownerID)
+{
+	Account::InputAccount(ownerID);
+}
+
+
 // pure virtual mehtods overrides
 int CurrentAccount::GetAccountType() const
 {
@@ -66,4 +74,11 @@ std::ostream& operator<<(std::ostream& outStream, const CurrentAccount& currentA
 				<< static_cast<const Account&>(currentAccount);
 
 	return outStream;
+}
+
+std::istream& operator>>(std::istream& inStream, CurrentAccount& currentAccount)
+{
+	inStream >> static_cast<Account&>(currentAccount);
+
+	return inStream;
 }

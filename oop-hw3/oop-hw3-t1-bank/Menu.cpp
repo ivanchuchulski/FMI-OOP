@@ -2,68 +2,63 @@
 
 #include <iostream>
 #include <cstring>
+#include <algorithm>
 
-Menu::Menu(std::string legalCommands)
-	: m_LegalCommands(legalCommands)
-{}
-
-char Menu::ConvertToUpperCase(char symbol)
+Menu::Menu(std::vector<int> legalCommands)
+	: m_legalCommands(legalCommands)
 {
-	if (symbol >= 'a' && symbol <= 'z')
-		return symbol - ('a' - 'A');
-
-	return symbol;
+	std::sort(m_legalCommands.begin(), m_legalCommands.end());
 }
 
-
-char Menu::ExtractSymbol()
+int Menu::SafetyInputIntegerInBounds(const int lowerBound, const int upperBound) const
 {
-	char response;
+	int input;
 
-	std::cout << "Enter a command  : ";
-
-	std::cin >> response;
-	std::cin.get();
-
-	return ConvertToUpperCase(response);
-}
-
-bool Menu::LegalCommand(char symbol)
-{
-	for (char cmd : m_LegalCommands)
+	do
 	{
-		if (cmd == symbol)
-			return true;
-	}
-
-	return false;
-}
-
-void Menu::ShowMenu()
-{
-	std::cout << "\n\t\t###### Computer Mice Shop ######";
-
-	std::cout << "\n\tA \tAdd a new mouse";
-	std::cout << "\n\tX \tDelete a mouse";
-	std::cout << "\n\tC \tUpdate a mouse spec";
-	std::cout << "\n\tD \tDisplay the mice in the shop";
-
-	std::cout << "\n\t? \tShow the menu";
-	std::cout << "\n\tQ \tQuit\n";
-}
-
-char Menu::GetCommand()
-{
-	char userCommand = ExtractSymbol();
-
-	while (!LegalCommand(userCommand))
-	{
-		std::cout << "Illegal command, please enter again";
 		ShowMenu();
-		userCommand = ExtractSymbol();
-	}
 
-	return userCommand;
+		std:: cin >> input;
+
+		if (std::cin.fail())
+		{
+			std::cout << "error : invalid command, please try again\n";
+
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			continue;
+		}
+	} while (input < lowerBound || input > upperBound);
+
+	return input;
+}
+
+void Menu::ShowMenu() const
+{
+	std::cout << "\n\t\t###### Bank menu ######";
+
+	std::cout << "\n"
+		<< "\t 1 - List customers\n"
+		<< "\t 2 - Add new customer\n"
+		<< "\t 3 - Delete customer\n"
+		<< "\t 4 - List all accounts\n"
+		<< "\t 5 - List all customer's accounts\n"
+		<< "\t 6 - Add new account\n"
+		<< "\t 7 - Delete an account\n"
+		<< "\t 8 - Withdraw from an account\n"
+		<< "\t 9 - Deposit to an account\n"
+		<< "\t 10 - Transfer money from one account to another\n"
+		<< "\t 11 - Display information about the bank\n"
+		<< "\t 12 - Quit\n"
+		<< "\t 13 - Show the menu\n";
+}
+
+int Menu::GetCommand() const
+{
+	int lowerBound = m_legalCommands.front();
+	int upperBound = m_legalCommands.back();
+
+	return SafetyInputIntegerInBounds(lowerBound, upperBound);
 }
 
 
