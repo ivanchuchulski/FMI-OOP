@@ -9,11 +9,12 @@ class CurrentAccount
 	:	public Account
 {
 public:
-	CurrentAccount();
+	CurrentAccount() = delete;
 	CurrentAccount(const CurrentAccount& other);
-	CurrentAccount(int initialDeposit, const std::string& ownerID, const std::string& iban);
+	CurrentAccount(const std::string& ownerID);
+	CurrentAccount(const std::string& ownerID, double initialDeposit);
 
-	~CurrentAccount() = default;
+	virtual ~CurrentAccount() = default;
 
 	CurrentAccount& operator=(const CurrentAccount& other);
 
@@ -23,8 +24,8 @@ public:
 	// pure virtual mehtods 
 	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;
-	virtual void Deposit(int depositAmmount) override;
-	virtual bool Withdraw(int withdrawAmmount) override;
+	virtual void Deposit(double depositAmmount) override;
+	virtual bool Withdraw(double withdrawAmmount) override;
 	virtual void DisplayAccount() const override;
 
 	// friend methods

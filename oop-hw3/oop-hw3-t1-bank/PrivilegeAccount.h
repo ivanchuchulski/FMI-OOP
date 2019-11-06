@@ -9,20 +9,21 @@ class PrivilegeAccount
 	: public Account
 {
 public:
-	PrivilegeAccount();
-	PrivilegeAccount(const PrivilegeAccount& other);
-	PrivilegeAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, int overdraft);
+	PrivilegeAccount() = delete;
+	PrivilegeAccount(const PrivilegeAccount& other) = default;
+	PrivilegeAccount(const std::string& ownerID);
+	PrivilegeAccount(const std::string& ownerID, double initialDeposit, double overdraft);
 
-	~PrivilegeAccount();
+	virtual ~PrivilegeAccount();
 
 	PrivilegeAccount& operator=(const PrivilegeAccount& other);
 
 	// getters
-	const int GetOverdraft() const;
+	const double GetOverdraft() const;
 
 	// setters
-	void IncreaseOverdraft(int overdraftIncrease);
-	void DecreaseOverdraft(int overdraftDecrease);
+	void IncreaseOverdraft(double overdraftIncrease);
+	void DecreaseOverdraft(double overdraftDecrease);
 
 	// virtual methods
 	virtual void InputAccount(const std::string& ownerID) override;
@@ -30,20 +31,18 @@ public:
 	// pure virtual mehtods overrides
 	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;
-	void Deposit(int depositAmmount) override;
-	bool Withdraw(int withdrawAmmount) override;
+	void Deposit(double depositAmmount) override;
+	bool Withdraw(double withdrawAmmount) override;
 	void DisplayAccount() const override;
-
 
 	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const PrivilegeAccount& somePrivilAcc);
 
 private:
-	static const int M_OVERDRAFT_DEFAULT;
+	static const double M_OVERDRAFT_DEFAULT;
 
 private:
-	int m_overdraftOverBalance;
-
+	double m_overdraftOverBalance;
 };
 
 #endif // !PRIVILEGE_ACCOUNT_H

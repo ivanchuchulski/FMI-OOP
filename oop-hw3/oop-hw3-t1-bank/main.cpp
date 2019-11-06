@@ -34,7 +34,7 @@ int main()
 
 	do 
 	{
-		bankMenu.ShowMenu();
+		//bankMenu.ShowMenu();
 		command = bankMenu.GetCommand();
 
 		switch (command)
@@ -165,7 +165,7 @@ int main()
 				std::string sourceIBAN;
 				std::string destinationIBAN;
 
-				std::cout << "enter account iban to withdraw from : ");
+				std::cout << "enter account iban to withdraw from : ";
 				sourceIBAN = InputString();
 
 				std::cout << "enter account iban to deposit to : ";

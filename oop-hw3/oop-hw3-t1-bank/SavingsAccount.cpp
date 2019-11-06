@@ -5,18 +5,13 @@
 const float SavingsAccount::M_YEARLY_INTEREST_DEFAULT = 1.1f;
 
 //
-SavingsAccount::SavingsAccount()
-	:	Account(),
+SavingsAccount::SavingsAccount(const std::string& ownerID)
+	:	Account(ownerID),
 		m_yearlyInterestProcent(M_YEARLY_INTEREST_DEFAULT)
 {}
 
-SavingsAccount::SavingsAccount(const SavingsAccount& other)
-	:	Account(other),
-		m_yearlyInterestProcent(other.m_yearlyInterestProcent)
-{}
-
-SavingsAccount::SavingsAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, float yearlyInterestProcent)
-	:	Account(initialDeposit, ownerID, iban),
+SavingsAccount::SavingsAccount(const std::string& ownerID, double initialDeposit, float yearlyInterestProcent)
+	:	Account(ownerID, initialDeposit),
 		m_yearlyInterestProcent((yearlyInterestProcent >= 0.0f && yearlyInterestProcent <= 100.0f) ? yearlyInterestProcent : M_YEARLY_INTEREST_DEFAULT)
 {}
 
@@ -58,7 +53,7 @@ void SavingsAccount::IncreaseInterest(float interestIncrease)
 
 void SavingsAccount::DecreaseInterest(float interestDecrease)
 {
-	if (interestDecrease > 0)
+	if (interestDecrease < 0)
 		return;
 
 	float decreasedInterest = m_yearlyInterestProcent - interestDecrease;
@@ -91,12 +86,12 @@ Account* SavingsAccount::CloneAccount() const
 	return new SavingsAccount(*this);
 }
 
-void SavingsAccount::Deposit(int depositAmmount)
+void SavingsAccount::Deposit(double depositAmmount)
 {
 	IncreaseBalance(depositAmmount);
 }
 
-bool SavingsAccount::Withdraw(int withdrawAmmount)
+bool SavingsAccount::Withdraw(double withdrawAmmount)
 {
 	if (GetBalance() < withdrawAmmount) 
 	{

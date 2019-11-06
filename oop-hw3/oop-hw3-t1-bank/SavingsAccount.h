@@ -6,9 +6,10 @@ class SavingsAccount
 	:	public Account
 {
 public:
-	SavingsAccount();
-	SavingsAccount(const SavingsAccount& other);
-	SavingsAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, float yearlyInterestProcent	);
+	SavingsAccount() = delete;
+	SavingsAccount(const SavingsAccount& other) = default;
+	SavingsAccount(const std::string& ownerID);
+	SavingsAccount(const std::string& ownerID, double initialDeposit, float yearlyInterestProcent);
 
 	~SavingsAccount();
 
@@ -18,8 +19,8 @@ public:
 	const float GetInterestProcent();
 
 	// setters
-	void IncreaseInterest(float interest);
-	void DecreaseInterest(float interest);
+	void IncreaseInterest(float interestIncrease);
+	void DecreaseInterest(float interestDecrease);
 
 	// virtual methods
 	virtual void InputAccount(const std::string& ownerID) override;
@@ -27,8 +28,8 @@ public:
 	// pure virtual mehtods overrides
 	virtual int GetAccountType() const override;
 	virtual Account* CloneAccount() const override;
-	virtual void Deposit(int depositAmmount) override;
-	virtual bool Withdraw(int withdrawAmmount) override;
+	virtual void Deposit(double depositAmmount) override;
+	virtual bool Withdraw(double withdrawAmmount) override;
 	virtual void DisplayAccount() const override;
 
 	// friend methods
@@ -39,6 +40,5 @@ private:
 
 private:
 	float m_yearlyInterestProcent;
-
 };
 

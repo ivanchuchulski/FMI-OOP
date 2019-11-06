@@ -1,28 +1,24 @@
 #include "PrivilegeAccount.h"
 
 // static member initialization
-const int PrivilegeAccount::M_OVERDRAFT_DEFAULT = 100;
+const double PrivilegeAccount::M_OVERDRAFT_DEFAULT = 100.0;
 
 //
-PrivilegeAccount::PrivilegeAccount()
-	:	Account(),
-		m_overdraftOverBalance(0)
+PrivilegeAccount::PrivilegeAccount(const std::string& ownerID)
+	:	Account(ownerID),
+		m_overdraftOverBalance(M_OVERDRAFT_DEFAULT)
 {}
 
-PrivilegeAccount::PrivilegeAccount(const PrivilegeAccount& other)
-	:	Account(other),
-		m_overdraftOverBalance(other.m_overdraftOverBalance)
-{}
 
-PrivilegeAccount::PrivilegeAccount(int initialDeposit, const std::string& ownerID, const std::string& iban, int overdraft)
-	:	Account(initialDeposit, ownerID, iban),
-		m_overdraftOverBalance((overdraft >= 0) ? overdraft : 0)
+PrivilegeAccount::PrivilegeAccount(const std::string& ownerID, double initialDeposit, double overdraft)
+	:	Account(ownerID, initialDeposit),
+		m_overdraftOverBalance((overdraft >= 0) ? overdraft : M_OVERDRAFT_DEFAULT)
 {}
 
 PrivilegeAccount::~PrivilegeAccount()
 {}
 
-PrivilegeAccount & PrivilegeAccount::operator=(const PrivilegeAccount& other)
+PrivilegeAccount& PrivilegeAccount::operator=(const PrivilegeAccount& other)
 {
 	if (this != &other) 
 	{
@@ -35,27 +31,34 @@ PrivilegeAccount & PrivilegeAccount::operator=(const PrivilegeAccount& other)
 
 
 // getters
-const int PrivilegeAccount::GetOverdraft() const
+const double PrivilegeAccount::GetOverdraft() const
 {
 	return m_overdraftOverBalance;
 }
 
 
 // setters
-void PrivilegeAccount::IncreaseOverdraft(int overdraftIncrease)
+void PrivilegeAccount::IncreaseOverdraft(double overdraftIncrease)
 {
+	// overdraftIncrease should be positive number
 	if (overdraftIncrease < 0)
 		return;
 
 	m_overdraftOverBalance += overdraftIncrease;
 }
 
-void PrivilegeAccount::DecreaseOverdraft(int overdraftDecrease)
+void PrivilegeAccount::DecreaseOverdraft(double overdraftDecrease)
 {
-	if (overdraftDecrease > 0)
+	// overdraftDecrease should be positive number
+	if (overdraftDecrease < 0)
 		return;
 
-	m_overdraftOverBalance -= overdraftDecrease;
+	double decreasedOverdraft = m_overdraftOverBalance - overdraftDecrease;
+
+	if (decreasedOverdraft <= 0)
+		return;
+
+	m_overdraftOverBalance = decreasedOverdraft;
 }
 
 
@@ -79,12 +82,12 @@ Account* PrivilegeAccount::CloneAccount() const
 	return new PrivilegeAccount(*this);
 }
 
-void PrivilegeAccount::Deposit(int depositAmmount)
+void PrivilegeAccount::Deposit(double depositAmmount)
 {
 	IncreaseBalance(depositAmmount);
 }
 
-bool PrivilegeAccount::Withdraw(int withdrawAmmount)
+bool PrivilegeAccount::Withdraw(double withdrawAmmount)
 {
 	if (GetBalance() + m_overdraftOverBalance < withdrawAmmount) 
 	{

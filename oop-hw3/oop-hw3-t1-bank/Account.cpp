@@ -1,13 +1,32 @@
 #include "Account.h"
 
-const unsigned int Account::M_IBAN_COUNTER = 0;
+unsigned int Account::M_IBAN_COUNTER = 0;
 
 
-Account::Account(double initialDeposit, const std::string& ownerID)
-	:	m_balance(initialDeposit > 0 ? initialDeposit : 0),
+//
+Account::Account(const std::string& ownerID)
+	:	m_balance(0.0),
 		m_ownerID(ownerID),
-		m_accountIBAN(iban)
+		m_accountIBAN(GenerateNumberedString("#IBAN#"))
+{
+}
+
+Account::Account(const std::string& ownerID, double initialDeposit)
+	:	m_balance(initialDeposit > 0 ? initialDeposit : 0.0),
+		m_ownerID(ownerID),
+		m_accountIBAN(GenerateNumberedString("#IBAN#"))
 {}
+
+
+// private method to generate numbered strings for the IBAN
+std::string Account::GenerateNumberedString(const std::string& prefix) const
+{
+	std::string result = prefix;
+	result.append(std::to_string(M_IBAN_COUNTER++));
+
+	return result;
+}
+
 
 // modifiers
 void Account::IncreaseBalance(double increase)

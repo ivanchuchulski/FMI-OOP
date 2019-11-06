@@ -1,20 +1,20 @@
 #include "CurrentAccount.h"
 
 
-CurrentAccount::CurrentAccount()
-	:	Account()
-{}
-
+//
 CurrentAccount::CurrentAccount(const CurrentAccount& other)
 	:	Account(other)
 {}
 
-CurrentAccount::CurrentAccount(int initialDeposit, const std::string & ownerID, const std::string & iban)
-	:	Account(initialDeposit, ownerID, iban)
+
+CurrentAccount::CurrentAccount(const std::string& ownerID)
+	: Account(ownerID)
 {}
 
-CurrentAccount::~CurrentAccount()
+CurrentAccount::CurrentAccount(const std::string& ownerID, double initialDeposit)
+	:	Account(ownerID, initialDeposit)
 {}
+
 
 CurrentAccount & CurrentAccount::operator=(const CurrentAccount & other)
 {
@@ -45,12 +45,12 @@ Account* CurrentAccount::CloneAccount() const
 	return new CurrentAccount(*this);
 }
 
-void CurrentAccount::Deposit(int depositAmmount)
+void CurrentAccount::Deposit(double depositAmmount)
 {
 	IncreaseBalance(depositAmmount);
 }
 
-bool CurrentAccount::Withdraw(int withdrawAmmount)
+bool CurrentAccount::Withdraw(double withdrawAmmount)
 {
 	if (GetBalance() < withdrawAmmount) 
 	{

@@ -16,9 +16,10 @@ enum class AccountType
 class Account 
 {
 public:
-	Account() = default;
+	Account() = delete;
 	Account(const Account& other) = default;
-	Account(double initialDeposit, const std::string& ownerID, const std::string& iban);
+	Account(const std::string& ownerID);
+	Account(const std::string& ownerID, double initialDeposit);
 
 	virtual ~Account() = default;
 
@@ -52,10 +53,11 @@ protected:
 	void IncreaseBalance(double increase);
 	void DecreaseBalance(double decrease);
 
+private:
 	std::string GenerateNumberedString(const std::string& prefix) const;
 
 private:
-	static const unsigned int M_IBAN_COUNTER;
+	static unsigned int M_IBAN_COUNTER;
 
 private:
 	double m_balance;

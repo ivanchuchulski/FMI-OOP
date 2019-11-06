@@ -4,7 +4,6 @@
 #define BANK_H
 
 #include <vector>
-#include <functional>		// std::invoke
 
 #include "Customer.h"
 #include "Account.h"
@@ -32,8 +31,8 @@ public:
 	const std::string GetAddress() const;
 
 	// customer modifiers
-	void AddCustomer(const std::string& customerID, const std::string& name, const std::string& address);
-	void DeleteCustomer(const std::string& customer_id);
+	void AddCustomer(const std::string& customerID, const std::string& customerName, const std::string& customerAddress);
+	void DeleteCustomer(const std::string& customerID);
 
 	// account modifiers
 	void AddAccount(const std::string& ownerID, const AccountType accountType);
@@ -47,12 +46,12 @@ public:
 	// bank information
 	void ListCustomers() const;
 	void ListAccounts() const;
-	void ListCustomerAccount(const std::string& customer_id) const;
+	void ListCustomerAccount(const std::string& customerID) const;
 	void PrintSupportedAccountTypes() const;
 	void DisplayBank() const;
 
 	// friend methods
-	friend std::ostream& operator<<(std::ostream& outStream, const Bank& someBank);
+	friend std::ostream& operator<<(std::ostream& outStream, const Bank& bank);
 
 private:
 	void ClearAccounts();
@@ -60,15 +59,15 @@ private:
 	
 	void ClearBank();
 	void CopyOtherBank(const Bank& otherBank);
-
-	bool NoRegisteredCustomers() const;
-	bool NoAccountsOpened() const;
 	
 	std::vector<Customer>::const_iterator FindByCustomerID(const std::string& customerID) const;
 	std::vector<Account*>::const_iterator FindAccountByIBAN(const std::string& accountIBAN) const;
 
-	bool AccountOpened(const std::vector<Account*>::const_iterator accountIt) const;	
-	bool CustomerRegistered(const std::vector<Customer>::const_iterator customerIt) const;
+	bool AccountAlreadyOpened(const std::vector<Account*>::const_iterator accountIt) const;	
+	bool CustomerAlreadyRegistered(const std::vector<Customer>::const_iterator customerIt) const;
+
+	bool NoRegisteredCustomers() const;
+	bool NoAccountsOpened() const;
 
 private:
 	std::string m_bankName;
