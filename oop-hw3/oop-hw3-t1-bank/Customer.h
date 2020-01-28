@@ -8,8 +8,6 @@
 
 class Customer 
 {
-
-
 public:
 	Customer() = default;
 	Customer(const Customer& other) = default;
@@ -28,9 +26,6 @@ public:
 	const std::string GetID() const;
 	const std::string GetName() const;
 	const std::string GetAddress() const;
-	
-	// method to copy customer
-//	Customer* CloneCustomer() const;
 
 	void DisplayCustomerInfo() const;
 
