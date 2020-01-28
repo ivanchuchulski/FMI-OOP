@@ -16,10 +16,18 @@
 #include "Menu.h"
 
 
+void IgnoreWhitespaces()
+{
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
 std::string InputString()
 {
 	std::string str;
-	std::getline(std::cin, str, '\n');
+
+	//std::cin.clear();
+	//std::cin.sync();
+	std::getline(std::cin, str);
 
 	return str;
 }
@@ -36,6 +44,7 @@ int main()
 	{
 		//bankMenu.ShowMenu();
 		command = bankMenu.GetCommand();
+		IgnoreWhitespaces();
 
 		switch (command)
 		{
@@ -104,10 +113,12 @@ int main()
 				std::string customerID;
 
 				bank->PrintSupportedAccountTypes();
-				std::cout << "enter a account type : ";
 
+				std::cout << "enter a account type : ";
 				std::cin >> accountType;
 
+				IgnoreWhitespaces();
+				std::cout << "enter customerID for the new account : ";
 				customerID = InputString();
 
 				bank->AddAccount(customerID, static_cast<AccountType>(accountType));
@@ -148,11 +159,13 @@ int main()
 				int depositAmmount = 0;
 				std::string sourceIBAN;
 
-				std::cout << "enter account iban to deposit to : ";
-				sourceIBAN = InputString();
-
 				std::cout << "enter amount to deposit to the account : ";
 				std::cin >> depositAmmount;
+
+				IgnoreWhitespaces();
+
+				std::cout << "enter account iban to deposit to : ";
+				sourceIBAN = InputString();
 
 				bank->DepositToAccount(sourceIBAN, depositAmmount);
 				break;
@@ -165,14 +178,16 @@ int main()
 				std::string sourceIBAN;
 				std::string destinationIBAN;
 
+				std::cout << "enter amount to transfer : ";
+				std::cin >> transferAmmount;
+
+				IgnoreWhitespaces();
+
 				std::cout << "enter account iban to withdraw from : ";
 				sourceIBAN = InputString();
 
 				std::cout << "enter account iban to deposit to : ";
 				destinationIBAN = InputString();
-
-				std::cout << "enter amount to transfer : ";
-				std::cin >> transferAmmount;
 
 				bank->Transfer(sourceIBAN, destinationIBAN, transferAmmount);
 				break;
@@ -201,13 +216,13 @@ int main()
 		}
 	} while (!stop);
 
-	std::cout << "exitiing...\n";
+	std::cout << "exiting...\n";
 
 	Bank* someOtherBank = new Bank(*bank);
 
 	someOtherBank->DisplayBank();
 
-	/*free dynamic memory*/
+	// free dynamic memory
 	delete bank;
 	delete someOtherBank;
 
