@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 
+#include "Utils.h"
+
 enum class AccountType
 {
 	CurrentAccount = 0,
@@ -54,10 +56,8 @@ protected:
 	void DecreaseBalance(double decrease);
 
 private:
-	std::string GenerateNumberedString(const std::string& prefix) const;
-
-private:
 	static unsigned int M_IBAN_COUNTER;
+	static std::string M_IBAN_PREFIX;
 
 private:
 	double m_balance;
