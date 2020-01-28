@@ -10,9 +10,11 @@ class Menu
 {
 public:
 	Menu() = default;
+	Menu(const Menu& other) = default;
 	Menu(std::vector<int> legalCommands);
-	Menu(const Menu&) = default;
+
 	~Menu() = default;
+
 	Menu& operator=(const Menu&) = default;
 
 	void ShowMenu() const;
