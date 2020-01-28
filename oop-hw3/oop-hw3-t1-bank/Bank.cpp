@@ -99,7 +99,7 @@ std::vector<Account*>::const_iterator Bank::FindAccountByIBAN(const std::string&
 {
 	for (auto accountIt = m_accounts.begin(); accountIt != m_accounts.end(); ++accountIt)
 	{
-		if ((*accountIt)->GetOwnerID() == accountIBAN)
+		if ((*accountIt)->GetAccountIBAN() == accountIBAN)
 		{
 			return accountIt;
 		}
@@ -373,7 +373,7 @@ void Bank::ListCustomers() const
 		return;
 	}
 
-	std::cout << "Printing bank customers : \n";
+	std::cout << "printing bank customers : \n";
 	for (const Customer& customer : m_customers)
 	{
 		customer.DisplayCustomerInfo();
@@ -384,17 +384,17 @@ void Bank::ListAccounts() const
 {
 	if (NoRegisteredCustomers())
 	{
-		std::cout << "bank has no customers";
+		std::cout << "bank has no customers and thus no accounts opened\n";
 		return;
 	}
 
 	if (NoAccountsOpened()) 
 	{
-		std::cout << "the bank has no accounts\n";
+		std::cout << "bank has no accounts opened\n";
 		return;
 	}
 
-	std::cout << "Printing bank accounts : \n";
+	std::cout << "printing bank accounts : \n";
 
 	for (const Account* account : m_accounts)
 	{
