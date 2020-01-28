@@ -7,15 +7,14 @@ std::string Account::M_IBAN_PREFIX = "#IBAN#";
 Account::Account(const std::string& ownerID)
 	:	m_balance(0.0),
 		m_ownerID(ownerID),
-		m_accountIBAN(Utils::GenerateNumberedStringWithPrefix(M_IBAN_PREFIX, M_IBAN_COUNTER))
+		m_accountIBAN(Utils::GenerateNumberedStringWithPrefix(M_IBAN_PREFIX, M_IBAN_COUNTER++))
 {}
 
 Account::Account(const std::string& ownerID, double initialDeposit)
 	:	m_balance(initialDeposit > 0 ? initialDeposit : 0.0),
 		m_ownerID(ownerID),
-		m_accountIBAN(Utils::GenerateNumberedStringWithPrefix(M_IBAN_PREFIX, M_IBAN_COUNTER))
+		m_accountIBAN(Utils::GenerateNumberedStringWithPrefix(M_IBAN_PREFIX, M_IBAN_COUNTER++))
 {}
-
 
 // modifiers
 void Account::IncreaseBalance(double increase)
