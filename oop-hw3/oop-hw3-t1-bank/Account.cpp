@@ -1,5 +1,7 @@
 #include "Account.h"
 
+#include "Utils.h"
+
 unsigned int Account::M_IBAN_COUNTER = 0;
 std::string Account::M_IBAN_PREFIX = "#IBAN#";
 
