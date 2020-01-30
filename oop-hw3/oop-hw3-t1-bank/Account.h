@@ -6,12 +6,8 @@
 #include <iostream>
 #include <string>
 
-enum class AccountType
-{
-	CurrentAccount = 0,
-	SavingsAccount = 1,
-	PrivileAccount = 2
-};
+#include "AccountTypesEnum.h"
+
 
 class Account 
 {
