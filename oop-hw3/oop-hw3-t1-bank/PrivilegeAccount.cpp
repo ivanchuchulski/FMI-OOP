@@ -1,5 +1,7 @@
 #include "PrivilegeAccount.h"
 
+// TODO : improve logic in the Withdraw method
+
 // static member initialization
 const double PrivilegeAccount::M_OVERDRAFT_DEFAULT = 100.0;
 
@@ -89,12 +91,21 @@ void PrivilegeAccount::Deposit(double depositAmmount)
 
 bool PrivilegeAccount::Withdraw(double withdrawAmmount)
 {
+	// if there is zero balance no withdraw
+	if (GetBalance() <= 0)
+	{
+		return false;
+	}
+
+	// balance plus overdraft is not enough to cover the withdraw
 	if (GetBalance() + m_overdraftOverBalance < withdrawAmmount) 
 	{
 		return false;
 	}
 
+	// add more conditions here
 	DecreaseBalance(withdrawAmmount);
+
 	return true;
 }
 
