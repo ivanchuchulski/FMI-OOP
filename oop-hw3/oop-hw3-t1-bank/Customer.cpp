@@ -1,10 +1,11 @@
 #include "Customer.h"
 
 //static members initialization
-const std::string Customer::M_ID_DEFAULT= "#001";
+unsigned int Customer::M_ID_COUNTER = 0;
+const std::string Customer::M_ID_PREFIX= "#ID#";
 
-Customer::Customer(const std::string& id, const std::string& name, const std::string& address)
-	:	m_id(id),
+Customer::Customer(const std::string& name, const std::string& address)
+	:	m_id(Utils::GenerateNumberedStringWithPrefix(M_ID_PREFIX, M_ID_COUNTER)),
 		m_name(name),
 		m_address(address)
 {}

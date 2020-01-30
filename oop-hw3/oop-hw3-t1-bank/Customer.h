@@ -6,12 +6,14 @@
 #include <iostream>
 #include <string>
 
+#include "Utils.h"
+
 class Customer 
 {
 public:
 	Customer() = default;
 	Customer(const Customer& other) = default;
-	Customer(const std::string& id, const std::string& name, const std::string& address);
+	Customer(const std::string& name, const std::string& address);
 
 	~Customer() = default;
 
@@ -33,7 +35,8 @@ public:
 	friend std::ostream& operator<<(std::ostream& outStr, const Customer& someCustomer);
 
 private:
-	static const std::string M_ID_DEFAULT;
+	static unsigned int M_ID_COUNTER;
+	static const std::string M_ID_PREFIX;
 
 private:
 	std::string m_id;
