@@ -154,22 +154,14 @@ const std::string Bank::GetAddress() const
 
 
 // customer modifiers
-void Bank::AddCustomer(const std::string& customerID, const std::string& customerName, const std::string& customerAddress)
+void Bank::AddCustomer(const std::string& customerName, const std::string& customerAddress)
 {
-	auto customerToAddIt = FindByCustomerID(customerID);
-
-	if (CustomerAlreadyRegistered(customerToAddIt))
-	{
-		std::cout << "customer addition failed : customer " << customerName << " already exists\n";
-		return;
-	}
-
-	m_customers.emplace_back(Customer(customerID, customerName, customerAddress));
+	m_customers.emplace_back(Customer(customerName, customerAddress));
 
 	std::cout << "success : customer " << customerName << " added\n";
 }
 
-void Bank::DeleteCustomer(const std::string& customerID)
+void Bank::DeleteCustomer(const std::string& customerIDToRemove)
 {
 	if (NoRegisteredCustomers()) 
 	{
@@ -177,7 +169,7 @@ void Bank::DeleteCustomer(const std::string& customerID)
 		return;
 	}
 
-	auto customerToRemoveIt = FindByCustomerID(customerID);
+	auto customerToRemoveIt = FindByCustomerID(customerIDToRemove);
 
 	if (!CustomerAlreadyRegistered(customerToRemoveIt)) 
 	{
@@ -188,7 +180,7 @@ void Bank::DeleteCustomer(const std::string& customerID)
 	// first removing all the accounts for that customer
 	for (size_t i = 0; i < m_accounts.size(); i++)
 	{
-		if (m_accounts[i]->GetOwnerID() == customerID) 
+		if (m_accounts[i]->GetOwnerID() == customerIDToRemove) 
 		{
 			delete m_accounts[i];
 			m_accounts.erase(m_accounts.begin() + i);
@@ -272,14 +264,18 @@ void Bank::DeleteAccount(const std::string& accountIBAN)
 		return;
 	}
 
-	delete m_accounts[ibanIndex - m_accounts.begin()];
+	// delete the account : first free memory and then delete the pointer in the vector
+	auto removeArrayIndex = ibanIndex - m_accounts.begin();
+
+	delete m_accounts[removeArrayIndex];
+	
 	m_accounts.erase(ibanIndex);
 
 	std::cout << "account removal success\n";
 }
 
 // bank money operations
-void Bank::Transfer(const std::string& fromIBAN, const std::string& toIBAN, int ammount)
+void Bank::Transfer(const std::string& fromIBAN, const std::string& toIBAN, double ammount)
 {
 	if (NoRegisteredCustomers())
 	{
@@ -293,28 +289,34 @@ void Bank::Transfer(const std::string& fromIBAN, const std::string& toIBAN, int 
 		return;
 	}
 
-	auto fromAccountIt = FindAccountByIBAN(fromIBAN);
-	auto toAccountIt = FindAccountByIBAN(toIBAN);
-
-	if (!AccountAlreadyOpened(fromAccountIt))
-	{
-		std::cout << "error : account to transfer from doesn't exist\n";
-		return;
-	}
-
-	if (!AccountAlreadyOpened(toAccountIt))
-	{
-		std::cout << "error : account to transfer to doesn't exist\n";
-		return;
-	}
-	
-	if (fromAccountIt == toAccountIt)
+	// check if the passed strings are the same
+	if (fromIBAN== toIBAN)
 	{
 		std::cout << "error : source and destination IBANs are the same\n";
 		return;
 	}
 
-	bool withdrawSuccessful = m_accounts[fromAccountIt - m_accounts.begin()]->Withdraw(ammount);
+	auto sourceIt = FindAccountByIBAN(fromIBAN);
+	auto destIt = FindAccountByIBAN(toIBAN);
+
+	// check if both accounts exist
+	if (!AccountAlreadyOpened(sourceIt))
+	{
+		std::cout << "error : account to transfer from doesn't exist\n";
+		return;
+	}
+
+	if (!AccountAlreadyOpened(destIt))
+	{
+		std::cout << "error : account to transfer to doesn't exist\n";
+		return;
+	}
+
+	auto sourceArrayIndex = sourceIt- m_accounts.begin();
+	auto destArrayIndex = destIt - m_accounts.begin();
+
+	 //try to withdraw from source account
+	bool withdrawSuccessful = m_accounts[sourceArrayIndex]->Withdraw(ammount);
 
 	if (!withdrawSuccessful) 
 	{
@@ -322,12 +324,13 @@ void Bank::Transfer(const std::string& fromIBAN, const std::string& toIBAN, int 
 		return;
 	}
 
-	m_accounts[toAccountIt - m_accounts.begin()]->Deposit(ammount);
+	// transfer to destination account
+	m_accounts[destArrayIndex]->Deposit(ammount);
 
-	std::cout << "Transfer succeessful!\n";
+	std::cout << "Transfer successful!\n";
 }
 
-void Bank::DepositToAccount(const std::string& accountIBAN, int depositAmmount)
+void Bank::DepositToAccount(const std::string& accountIBAN, double depositAmmount)
 {
 	auto foundIndex = FindAccountByIBAN(accountIBAN);
 
@@ -337,12 +340,14 @@ void Bank::DepositToAccount(const std::string& accountIBAN, int depositAmmount)
 		return;
 	}
 
-	m_accounts[foundIndex - m_accounts.begin()]->Deposit(depositAmmount);
+	auto accountArrayIndex = foundIndex - m_accounts.begin();
+
+	m_accounts[accountArrayIndex]->Deposit(depositAmmount);
 
 	std::cout << "account deposit success\n";
 }
 
-bool Bank::WithdrawFromAccount(const std::string& accountIBAN, int withdrawAmmount)
+bool Bank::WithdrawFromAccount(const std::string& accountIBAN, double withdrawAmmount)
 {
 	auto foundIndex = FindAccountByIBAN(accountIBAN);
 
@@ -352,7 +357,9 @@ bool Bank::WithdrawFromAccount(const std::string& accountIBAN, int withdrawAmmou
 		return false;
 	}
 
-	bool withdrawSuccessful = m_accounts[foundIndex - m_accounts.begin()]->Withdraw(withdrawAmmount);
+	auto accountArrayIndex = foundIndex - m_accounts.begin();
+
+	bool withdrawSuccessful = m_accounts[accountArrayIndex]->Withdraw(withdrawAmmount);
 
 	if (!withdrawSuccessful) 
 	{

@@ -14,12 +14,15 @@
 class Bank 
 {
 public:
+	// constructor
 	Bank();
 	Bank(const Bank& other);
 	Bank(const std::string& bankName, const std::string& bankAddress);
 
+	// destructor
 	~Bank();
 
+	// copy assignment operator
 	Bank& operator=(const Bank& someBank);
 
 	// setters
@@ -31,17 +34,17 @@ public:
 	const std::string GetAddress() const;
 
 	// customer modifiers
-	void AddCustomer(const std::string& customerID, const std::string& customerName, const std::string& customerAddress);
-	void DeleteCustomer(const std::string& customerID);
+	void AddCustomer(const std::string& customerName, const std::string& customerAddress);
+	void DeleteCustomer(const std::string& customerIDToRemove);
 
 	// account modifiers
 	void AddAccount(const std::string& ownerID, const AccountType accountType);
 	void DeleteAccount(const std::string& iban);
 
 	// bank money operations
-	void Transfer(const std::string& fromIBAN, const std::string& toIBAN, int ammount);
-	void DepositToAccount(const std::string& accountIBAN, int depositAmmount);
-	bool WithdrawFromAccount(const std::string& accountIBAN, int withdrawAmmount);
+	void Transfer(const std::string& fromIBAN, const std::string& toIBAN, double ammount);
+	void DepositToAccount(const std::string& accountIBAN, double depositAmmount);
+	bool WithdrawFromAccount(const std::string& accountIBAN, double withdrawAmmount);
 
 	// bank information
 	void ListCustomers() const;

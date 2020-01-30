@@ -58,12 +58,8 @@ int main()
 			// add customer
 			case 2 :
 			{
-				std::string customerID;
 				std::string	customerName;
 				std::string	customerAddress;
-
-				std::cout << "enter a customerID to add : ";
-				customerID = InputString();
 
 				std::cout << "enter customer name : ";
 				customerName = InputString();
@@ -71,19 +67,19 @@ int main()
 				std::cout << "enter customer address : ";
 				customerAddress = InputString();
 
-				bank->AddCustomer(customerID, customerName, customerAddress);
+				bank->AddCustomer(customerName, customerAddress);
 				break;
 			}
 
 			// delete customer
 			case 3 :
 			{
-				std::string customerID;
+				std::string customerIDToDelete;
 				
 				std::cout << "Enter a customerID to delete : ";
-				customerID = InputString();
+				customerIDToDelete = InputString();
 
-				bank->DeleteCustomer(customerID);
+				bank->DeleteCustomer(customerIDToDelete);
 				break;
 			}
 
@@ -118,7 +114,8 @@ int main()
 				std::cin >> accountType;
 
 				IgnoreWhitespaces();
-				std::cout << "enter customerID for the new account : ";
+
+				std::cout << "enter existing customerID for the new account : ";
 				customerID = InputString();
 
 				bank->AddAccount(customerID, static_cast<AccountType>(accountType));
@@ -142,12 +139,14 @@ int main()
 			{
 				int ammountToWithdraw = 0;
 				std::string ibanToWithdrawFrom;
-				
-				std::cout << "enter account IBAN to withdraw from : ";
-				ibanToWithdrawFrom = InputString();
 
 				std::cout << "enter amount to withdraw from the account : ";
 				std::cin >> ammountToWithdraw;
+				
+				IgnoreWhitespaces();
+
+				std::cout << "enter account IBAN to withdraw from : ";
+				ibanToWithdrawFrom = InputString();
 
 				bank->WithdrawFromAccount(ibanToWithdrawFrom, ammountToWithdraw);
 				break;
