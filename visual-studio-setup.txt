@@ -1,0 +1,11 @@
+
+
+in Project settins -> Configuration properties -> General
+    -Output Directory = $(SolutionDir)bin\$(Platform)\$(Configuration)\
+    -Intermediate Directory = $(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\
+
+don't put \ after SolutionDir, because it's a macro of the solution directoy and it puts the \ explicitly
+
+
+
+
