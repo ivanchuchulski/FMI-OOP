@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ACCOUNT_TYPES_ENUM_H
-#define ACCOUNT_TYPES_ENUM_H
+#ifndef ACCOUNT_TYPE_H
+#define ACCOUNT_TYPE_H
 
 
 enum class AccountType
@@ -12,4 +12,4 @@ enum class AccountType
 };
 
 
-#endif // !ACCOUNT_TYPES_ENUM_H
+#endif // !ACCOUNT_TYPE_H

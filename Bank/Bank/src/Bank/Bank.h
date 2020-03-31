@@ -5,11 +5,11 @@
 
 #include <vector>
 
-#include "Customer.h"
-#include "Account.h"
-#include "CurrentAccount.h"	
-#include "SavingsAccount.h"
-#include "PrivilegeAccount.h"
+#include "Customers/Customer.h"
+#include "Account/Account.h"
+#include "Accounts/CurrentAccount.h"	
+#include "Accounts/SavingsAccount.h"
+#include "Accounts/PrivilegeAccount.h"
 
 class Bank 
 {

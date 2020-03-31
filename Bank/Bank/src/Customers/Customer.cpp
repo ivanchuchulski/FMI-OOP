@@ -1,4 +1,4 @@
-#include "Customer.h"
+#include "Customers/Customer.h"
 
 //static members initialization
 unsigned int Customer::M_ID_COUNTER = 0;

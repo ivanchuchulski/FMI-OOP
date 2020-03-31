@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-#include "AccountTypesEnum.h"
+#include "AccountType/AccountType.h"
 
 
 class Account 

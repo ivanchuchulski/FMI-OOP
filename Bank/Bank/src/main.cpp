@@ -8,12 +8,12 @@
 #include <string>
 #include <array>
 
-#include "Customer.h"
-#include "CurrentAccount.h"	
-#include "SavingsAccount.h"
-#include "PrivilegeAccount.h"
-#include "Bank.h"
-#include "Menu.h"
+#include "Customers/Customer.h"
+#include "Accounts/CurrentAccount.h"
+#include "Accounts/SavingsAccount.h"
+#include "Accounts/PrivilegeAccount.h"
+#include "Bank/Bank.h"
+#include "Menu/Menu.h"
 
 
 void IgnoreWhitespaces()
