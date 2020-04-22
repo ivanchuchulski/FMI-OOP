@@ -30,6 +30,8 @@ public:
 	void SetOwnerID(const std::string& ownerID);
 	void SetIBAN(const std::string& iban);
 
+	bool AccountOwnedByCustomer(const std::string& customerID) const;
+
 	// virtual methods
 	virtual void InputAccount(const std::string& ownerID);
 
@@ -39,6 +41,7 @@ public:
 	virtual void Deposit(double depositAmmount) = 0;
 	virtual bool Withdraw(double withdrawAmmount) = 0;
 	virtual void DisplayAccount() const = 0;
+
 
 	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStream, const Account& account);

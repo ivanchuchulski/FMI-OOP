@@ -52,6 +52,20 @@ void Customer::DisplayCustomerInfo() const
 }
 
 
+Customer Customer::inputCustomer()
+{
+	std::string name;
+	std::string address;
+
+	std::cout << "enter customer name : ";
+	std::getline(std::cin, name);
+
+	std::cout << "enter customer address : ";
+	std::getline(std::cin, address);
+
+	return Customer(name, address);
+}
+
 // friend methods
 std::ostream& operator<<(std::ostream& outStream, const Customer& customer)
 {

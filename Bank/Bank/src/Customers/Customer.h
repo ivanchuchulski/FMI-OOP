@@ -31,6 +31,8 @@ public:
 
 	void DisplayCustomerInfo() const;
 
+	Customer inputCustomer();
+
 	// friend methods
 	friend std::ostream& operator<<(std::ostream& outStr, const Customer& someCustomer);
 

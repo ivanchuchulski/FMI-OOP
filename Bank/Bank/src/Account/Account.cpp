@@ -59,6 +59,11 @@ void Account::SetIBAN(const std::string& iban)
 }
 
 
+bool Account::AccountOwnedByCustomer(const std::string& customerID) const
+{
+	return m_ownerID == customerID;
+}
+
 // virtual methods
 void Account::InputAccount(const std::string& ownerID)
 {
